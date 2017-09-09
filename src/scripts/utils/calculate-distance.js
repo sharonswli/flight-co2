@@ -4,9 +4,12 @@ var distanceCorrectionMap = {
   'shortHaul': 50e3
 };
 
+Math.radians = function(degrees) {
+  return degrees * Math.PI / 180;
+};
+
 function getDistanceCorrection(distance) {
   var type;
-
   switch(true) {
     case (distance > 2500e3):
       type = 'longHaul';
@@ -17,13 +20,9 @@ function getDistanceCorrection(distance) {
     default: 
       type = 'middleHaul';
   };
-
   return distanceCorrectionMap[type];
 }
 
-Math.radians = function(degrees) {
-  return degrees * Math.PI / 180;
-};
 
 function getGreaterCircleDistance(airportA, airportB) {
   var EARTH_RADIUS = 6371e3; // Earth's radius in meters
@@ -58,15 +57,15 @@ function getTotalDistance(airports) {
   }, 0);
 }
 
-console.log("Route 1");
-var route1 = getTotalDistance([ { id: 'YVR', lat: 49.193889, long: -123.184444 }, { id: 'YYC', lat: 51.113888, long: -114.020278 } ]);
-console.log("route1 total distance: ", route1);
-console.log("Route 2");
-var route2 = getTotalDistance([ { id: 'YVR', lat: 49.193889, long: -123.184444 }, { id: 'YYZ', lat: 43.677223, long: -79.630556 }, { id: 'CDG', lat: 49.012779, long: 2.55 } ]);
-console.log("route2 total distance: ", route2);
-console.log("Route 3");
-var route3 = getTotalDistance([ { id: 'YVR', lat: 49.193889, long: -123.184444 }, { id: 'YYZ', lat: 43.677223, long: -79.630556 }, { id: 'CDG', lat: 49.012779, long: 2.55 }, { id: 'HKG', lat: 22.308919, long: 113.914603 } ]);
-console.log("route3 total distance: ", route3);
-console.log("Route 4");
-var route4 = getTotalDistance([ { id: 'YVR', lat: 49.193889, long: -123.184444 }, { id: 'YWG', lat: 49.910036, long: -97.239886 } ]);
-console.log("route1 total distance: ", route4);
+// console.log("Route 1");
+// var route1 = getTotalDistance([ { id: 'YVR', lat: 49.193889, long: -123.184444 }, { id: 'YYC', lat: 51.113888, long: -114.020278 } ]);
+// console.log("route1 total distance: ", route1);
+// console.log("Route 2");
+// var route2 = getTotalDistance([ { id: 'YVR', lat: 49.193889, long: -123.184444 }, { id: 'YYZ', lat: 43.677223, long: -79.630556 }, { id: 'CDG', lat: 49.012779, long: 2.55 } ]);
+// console.log("route2 total distance: ", route2);
+// console.log("Route 3");
+// var route3 = getTotalDistance([ { id: 'YVR', lat: 49.193889, long: -123.184444 }, { id: 'YYZ', lat: 43.677223, long: -79.630556 }, { id: 'CDG', lat: 49.012779, long: 2.55 }, { id: 'HKG', lat: 22.308919, long: 113.914603 } ]);
+// console.log("route3 total distance: ", route3);
+// console.log("Route 4");
+// var route4 = getTotalDistance([ { id: 'YVR', lat: 49.193889, long: -123.184444 }, { id: 'YWG', lat: 49.910036, long: -97.239886 } ]);
+// console.log("route1 total distance: ", route4);
