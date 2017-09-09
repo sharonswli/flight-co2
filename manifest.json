@@ -1,8 +1,8 @@
 {
-  "name": "__MSG_appName__",
+  "name": "Flight Footprints",
   "version": "0.0.1",
   "manifest_version": 2,
-  "description": "__MSG_appDescription__",
+  "description": "Find out the CO2 Footprint of your next flight!",
   "icons": {
     "16": "icons/icon-16.png",
     "128": "icons/icon-128.png"
@@ -40,7 +40,7 @@
       "19": "icons/icon-19.png",
       "38": "icons/icon-38.png"
     },
-    "default_title": "Google Flight CO2",
+    "default_title": "CO2 Info on your Selected Flight",
     "default_popup": "popup.html"
   }
 }
