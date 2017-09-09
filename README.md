@@ -8,13 +8,11 @@
   </p>
 </div>
 
-The Chrome Extensions is available [on the Chrome Web Store](https://chrome.google.com/webstore/detail/email-this/lgblkllcjgihfnlefhnnpppndbbjallh).
-
 ## Features
 TODO
 
 ## Installation
-1. Clone the repository `git clone https://github.com/EmailThis/extension-boilerplate.git`
+1. Clone the repository `git clone git@github.com:sharonswli/flight-co2.git`
 2. Run `npm install`
 3. Run `npm run build`
 

@@ -1,14 +1,14 @@
 {
   "appName": {
-    "message": "Ext Starter",
+    "message": "Google Flights: Visualize CO2 Footprint",
     "description": "The name of the extension."
   },
   "appDescription": {
-    "message": "Boilerplate for building cross browser extensions",
+    "message": "Compare and Visualize your CO2 Emissions for each Google Flight result!",
     "description": "The description of the extension."
   },
   "btnTooltip": {
-    "message": "Ext Starter",
+    "message": "Google Flights CO2",
     "description": "Tooltip for the button."
   }
 }
