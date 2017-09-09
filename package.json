@@ -1,7 +1,7 @@
 {
-  "name": "extension-boilerplate",
+  "name": "google-flights-co2",
   "version": "0.0.2",
-  "description": "A template for creating cross-browser extensions",
+  "description": "A Google flight plugin to display your Carbon footprint of a flight",
   "scripts": {
     "chrome-build": "cross-env TARGET=chrome gulp",
     "opera-build": "cross-env TARGET=opera gulp",
@@ -17,13 +17,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/EmailThis/extension-boilerplate"
+    "url": "https://github.com/sharonswli/flight-co2"
   },
-  "author": "Bharani <bharani91@gmail.com> (https://github.com/bharani91)",
+  "author": "Sharon SW Li <sharonsuetwli@gmail.com> (https://github.com/sharonswli)",
   "bugs": {
-    "url": "https://github.com/EmailThis/extension-boilerplate/issues"
+    "url": "https://github.com/sharonswli/flight-co2/issues"
   },
-  "homepage": "https://www.emailthis.me/extension-boilerplate",
+  "homepage": "",
   "devDependencies": {
     "babel-core": "^6.1.2",
     "babel-preset-es2015": "^6.1.2",
