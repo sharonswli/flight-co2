@@ -15,6 +15,7 @@ var template = (data) => {
   <div class="site-description">
     <h3 class="title">${data.title}</h3>
     <p class="description">${data.description}</p>
+    <p>Flights evaluated: ${data.numFlights}</p>
     <a href="${data.url}" target="_blank" class="url">${data.url}</a>
   </div>
   <div class="action-container">
@@ -37,9 +38,23 @@ var renderBookmark = (data) => {
   }
 }
 
+var renderFlights = function renderFlights(data) {
+  var displayContainer = document.getElementById("display-container")
+  if (data) {
+    console.log(data);
+    var tmpl = template(data);
+    displayContainer.innerHTML = tmpl; 
+  } else {
+    renderMessage("Sorry, could not extract flight information")
+  }
+}
+
 ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
   var activeTab = tabs[0];
-  chrome.tabs.sendMessage(activeTab.id, { action: 'process-page' }, renderBookmark);
+  // chrome.tabs.sendMessage(activeTab.id, { action: 'process-page' }, renderBookmark);
+
+  // Output # of flights
+  chrome.tabs.sendMessage(activeTab.id, { action: 'process-flights' }, renderFlights);
 });
 
 popup.addEventListener("click", function(e) {
