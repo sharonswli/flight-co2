@@ -10,3 +10,12 @@ ext.runtime.onMessage.addListener(
     }
   }
 );
+
+chrome.webRequest.onCompleted.addListener(function (tabId, changeInfo, tab) {
+  console.log("some request completed");
+},
+{
+  urls: ["https://*.google.com/*.js"]
+ },
+ ["responseHeaders"]);
+
