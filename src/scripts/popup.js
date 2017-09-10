@@ -1,5 +1,6 @@
 import ext from "./utils/ext";
 import storage from "./utils/storage";
+import {totalEmissions} from "./utils/co2-emissions-calculation";
 
 var popup = document.getElementById("app");
 storage.get('color', function(resp) {
@@ -8,6 +9,26 @@ storage.get('color', function(resp) {
     popup.style.backgroundColor = color
   }
 });
+
+
+var co2Emissions = () => {
+  var airports = [];
+  var airportA = new Object();
+  airportA.id = 'YVR';
+  airportA.lat = 49.193901062;
+  airportA.long = -123.183998108;
+  var airportB = new Object();
+  airportB.id = 'LGW';
+  airportB.lat = 51.148101806640625;
+  airportB.long = -0.19027799367904663;
+  airports.push(airportA, airportB);
+
+  return(`
+  <div class="site-description">
+    <h3>CO2 emissions from ${airports[0].id} to ${airports[1].id}: ${Math.round(totalEmissions(airports, 'one-way') / 1000  * 10) / 10}t</h3>
+  </div>
+  `)
+}
 
 var template = (data) => {
   var json = JSON.stringify(data);
@@ -29,10 +50,13 @@ var renderMessage = (message) => {
 
 var renderBookmark = (data) => {
   var displayContainer = document.getElementById("display-container")
+  // var emissions = co2Emissions();
   if(data) {
     var tmpl = template(data);
-    displayContainer.innerHTML = tmpl;  
+    displayContainer.innerHTML = template(data);
+    // displayContainer.innerHTML = emmisions;  
   } else {
+    // displayContainer.innerHTML = emissions; 
     renderMessage("Sorry, could not extract this page's title and URL")
   }
 }

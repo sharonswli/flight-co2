@@ -57,3 +57,5 @@ function getTotalDistance(airports) {
     return sum + gcdAB + offset;
   }, 0);
 }
+
+export { getTotalDistance };
