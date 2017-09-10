@@ -6,7 +6,6 @@ ext.runtime.onMessage.addListener(
     var resp = sendResponse
     if (request.action === "get-airports") {
       var requestData = JSON.parse(request.data);
-      var airports = requestData.airports;
       var flights = requestData.allFlights; 
       var distance;
 
@@ -34,9 +33,6 @@ ext.runtime.onMessage.addListener(
       };
       xhr.send();
       return true;
-      
-      
-      
     }
   }
 );

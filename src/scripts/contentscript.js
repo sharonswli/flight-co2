@@ -99,11 +99,27 @@ var extractFlights = function extractFlights() {
   return data;
 };
 
+var writeToScreen = function writeToScreen(iti, message){
+  if (iti !== null) {
+    var parentElem = document.querySelectorAll('[iti="'+iti+'"]')[0];
+    var childElem = parentElem.getElementsByClassName("EIGTDNC-d-Sb")[0];
+    var newDiv = document.createElement("DIV");
+    newDiv.style.color = "tomato";
+    message = "distance: " + message;
+    newDiv.appendChild(document.createTextNode(message));
+    childElem.appendChild(newDiv);
+  }
+}
+
 function onRequest(request, sender, sendResponse) {
   if (request.action === 'process-page') {
     sendResponse(extractTags())
   } else if (request.action === 'process-flights') {
     sendResponse(extractFlights());
+  } else if (request.action === 'insert-content') {
+    for (var i=0; i<request.data.length; i++) {
+      writeToScreen(request.data[i].iti, request.data[i].distance);
+    }
   }
 }
 
