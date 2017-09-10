@@ -40,13 +40,6 @@ The following tasks can be used when you want to start developing the extension 
 Run `npm run dist` to create a zipped, production-ready extension for each browser. You can then upload that to the appstore.
 
 
-## TODO
-- [ ] Add support for Safari
-- [x] Add Firefox & Opera Promo images
-- [x] Add sample screenshot templates
-- [ ] Write a guide for using config variables & JS preprocessor
-
-
 -----------
 This project is licensed under the MIT license. 
 
