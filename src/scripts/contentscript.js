@@ -57,7 +57,7 @@ var extractFlights = function extractFlights() {
     var flightInfo = {
       iti: "",
       numLayovers: "",
-      layoverAirports: []
+      flightRoute: []
     };
 
     var flight = flights[i];
@@ -75,18 +75,22 @@ var extractFlights = function extractFlights() {
       }
     }
 
+    var flightroute = [data.departingAirport];
+
     var layoversElem = flight.getElementsByClassName("EIGTDNC-d-Z")[0];
     if (layoversElem) {
       var layoversArray;
 
       if (flightInfo.numLayovers == 1) { // ie. "2h 32m in YYZ"
         layoversArray = layoversElem.innerHTML.split(" ").slice(-1)
-      } else { // ie. 
+      } else { // ie. YVR, YYZ
         layoversArray = layoversElem.innerHTML.split(", ")
       }
 
-      flightInfo.layoverAirports = layoversArray;
+      flightInfo.flightRoute = flightroute.concat(layoversArray);
     }
+
+    flightInfo.flightRoute.push(data.arrivingAirport);
 
     // Add flight info to allFlights array
     data.allFlights.push(flightInfo); 
