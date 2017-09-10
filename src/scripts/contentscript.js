@@ -46,8 +46,8 @@ function getData(airports){
           // console.log(airport.iata_faa)
           return airports.includes(airport.iata_faa);
         });
-        console.log(filtered)
-        distance = getTotalDistance(filtered);
+        console.log(filtered);
+        var distance = getTotalDistance(filtered);
         console.log(distance);
       }
   };
