@@ -1,5 +1,6 @@
 import ext from "./utils/ext";
-import getTotalDistance from "./utils/calculate-distance";
+import {getTotalDistance} from "./utils/calculate-distance";
+import {co2Emissions} from "./utils/co2-emissions-calculation";
 
 ext.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
@@ -25,6 +26,8 @@ ext.runtime.onMessage.addListener(
 
               distance = getTotalDistance(filtered);
               flight.distance = distance;
+
+              flight.emissions = co2Emissions(distance);
             }
 
             resp({ action: "have-airports", data: flights });

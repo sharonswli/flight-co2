@@ -58,4 +58,4 @@ function getTotalDistance(airports) {
   }, 0);
 }
 
-module.exports = getTotalDistance;
+export { getTotalDistance };

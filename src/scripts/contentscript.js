@@ -1,6 +1,5 @@
 import ext from "./utils/ext";
 
-
 var extractTags = () => {
   var url = document.location.href;
   if(!url || !url.match(/^http/)) return;
@@ -105,7 +104,7 @@ var writeToScreen = function writeToScreen(iti, message){
     var childElem = parentElem.getElementsByClassName("EIGTDNC-d-Sb")[0];
     var newDiv = document.createElement("DIV");
     newDiv.style.color = "tomato";
-    message = "distance: " + message;
+    message = "co2: " + message;
     newDiv.appendChild(document.createTextNode(message));
     childElem.appendChild(newDiv);
   }
@@ -118,7 +117,7 @@ function onRequest(request, sender, sendResponse) {
     sendResponse(extractFlights());
   } else if (request.action === 'insert-content') {
     for (var i=0; i<request.data.length; i++) {
-      writeToScreen(request.data[i].iti, request.data[i].distance);
+      writeToScreen(request.data[i].iti, request.data[i].emissions);
     }
   }
 }

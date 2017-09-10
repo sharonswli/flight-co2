@@ -1,5 +1,6 @@
 import ext from "./utils/ext";
 import storage from "./utils/storage";
+import {totalEmissions} from "./utils/co2-emissions-calculation";
 
 var popup = document.getElementById("app");
 storage.get('color', function(resp) {
@@ -9,7 +10,26 @@ storage.get('color', function(resp) {
   }
 });
 
-// Return html template with new data
+
+var co2Emissions = () => {
+  var airports = [];
+  var airportA = new Object();
+  airportA.id = 'YVR';
+  airportA.lat = 49.193901062;
+  airportA.long = -123.183998108;
+  var airportB = new Object();
+  airportB.id = 'LGW';
+  airportB.lat = 51.148101806640625;
+  airportB.long = -0.19027799367904663;
+  airports.push(airportA, airportB);
+
+  return(`
+  <div class="site-description">
+    <h3>CO2 emissions from ${airports[0].id} to ${airports[1].id}: ${Math.round(totalEmissions(airports, 'one-way') / 1000  * 10) / 10}t</h3>
+  </div>
+  `)
+}
+
 var template = (data) => {
   var json = JSON.stringify(data);
   return (`
@@ -32,7 +52,6 @@ var renderMessage = (message) => {
 var renderFlights = function renderFlights(data) {
   var displayContainer = document.getElementById("display-container")
   if (data) {
-    console.log("data: ", data);
     var tmpl = template(data);
     displayContainer.innerHTML = tmpl; 
   } else {
