@@ -1,5 +1,5 @@
 import ext from "./utils/ext";
-import getTotalDistance from "./utils/calculate-distance";
+
 
 var extractTags = () => {
   var url = document.location.href;
@@ -30,6 +30,7 @@ var extractFlights = function extractFlights() {
   var data = {
     departingAirport: "",
     arrivingAirport: "",
+    airports: [],
     allFlights: [],
     numFlights: ""
   };
@@ -41,10 +42,12 @@ var extractFlights = function extractFlights() {
 
   if (from.length == 1) {
     data.departingAirport = from[0];
+    data.airports.push(from[0]);
   }
 
   if (to.length == 1) {
     data.arrivingAirport = to[0];
+    data.airports.push(to[0]);
   }
 
   var flights = document.querySelectorAll('a.EIGTDNC-d-X');
@@ -101,25 +104,3 @@ function onRequest(request, sender, sendResponse) {
 }
 
 ext.runtime.onMessage.addListener(onRequest);
-
-function getData(airports){
-  var xhr = new XMLHttpRequest();
-  xhr.open('GET', chrome.extension.getURL('data/airport-data.json'), true);
-  xhr.onreadystatechange = function()
-  {
-      if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200)
-      {
-        var data = JSON.parse(xhr.responseText);
-        var filtered = data.filter(function(airport) {
-          // console.log(airport.iata_faa)
-          return airports.includes(airport.iata_faa);
-        });
-        console.log(filtered);
-        var distance = getTotalDistance(filtered);
-        console.log(distance);
-      }
-  };
-  xhr.send();
-}
-var airports = ['LAX', 'YVR'];
-getData(airports);

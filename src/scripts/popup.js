@@ -41,7 +41,7 @@ var renderBookmark = (data) => {
 var renderFlights = function renderFlights(data) {
   var displayContainer = document.getElementById("display-container")
   if (data) {
-    console.log(data);
+    // console.log(data);
     var tmpl = template(data);
     displayContainer.innerHTML = tmpl; 
   } else {
@@ -60,10 +60,10 @@ ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
 popup.addEventListener("click", function(e) {
   if(e.target && e.target.matches("#save-btn")) {
     e.preventDefault();
-    var data = e.target.getAttribute("data-bookmark");
-    ext.runtime.sendMessage({ action: "perform-save", data: data }, function(response) {
-      if(response && response.action === "saved") {
-        renderMessage("Your bookmark was saved successfully!");
+    var data = e.target.getAttribute("data-bookmark"); 
+    ext.runtime.sendMessage({ action: "get-airports", data: data }, function(response) {
+      if(response && response.action === "have-airports") {
+        renderMessage("have airports" + response.data);
       } else {
         renderMessage("Sorry, there was an error while saving your bookmark.");
       }
