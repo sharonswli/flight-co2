@@ -9,50 +9,67 @@ function getDepartureArrivalAirports() {
   var departingAirport;
   var arrivingAirport;
 
+  // TODO: handle 'all airports' selection  
   from.length === 1 ? departingAirport = from[0] : departingAirport = 'undefined';
   to.length === 1 ? arrivingAirport = to[0] : arrivingAirport = 'undefined';
 
   return { from: departingAirport, to: arrivingAirport };
 }
 
-
-function extractFlights() {
-  var flightData = {
-    departingAirport: "",
-    arrivingAirport: "",
-    allFlights: [],
-    numFlights: ""
-  };
-
+function checkIfResultsLoaded() {
   var flights = document.querySelectorAll('a.EIGTDNC-d-X');
-
-  // Check if flight infos are completely loaded on DOM  
-  if(flights.length < 1) {
+  
+  if(!flights.length) {
     console.log("Flights not yet loaded. Aborting...");
     return;
   }
+  // If results are loaded: 
+  const destination = getDepartureArrivalAirports();
+  const flightResults = extractFlights(flights, destination);
 
-  // Load number of flights to flightData object
-  flightData.numFlights = flights.length;
+  buildResultData(destination, flights.length, flightResults);
+  
+}
 
-  // Get new destination airports: the values are reliably outputted in the URL
-  var destination = getDepartureArrivalAirports();
+function buildResultData(destination, numFlights, flightResults) {
+  const flightData = {
+    departingAirport: "",
+    arrivingAirport: "",
+    allFlights: [],
+    numFlights: null
+  };
+  
+  // Input departingAirport and arrivingAirport data
   if(destination && destination.from && destination.to) {
     flightData.departingAirport = destination.from;
     flightData.arrivingAirport = destination.to;
   }
 
+  // Input numFlights
+  if(numFlights) {
+    flightData.numFlights = numFlights;
+  }
+
+  if(flightResults) {
+    flightData.allFlights = flightResults;
+  }
+  console.log("flightData: ", flightData);
+}
+
+function extractFlights(flights, destination) {  
+  const flightResuts = [];
+  // Get allFlights Array
   for (var i = 0; i < flights.length; i++) {
+    var flight = flights[i];
+    
     var flightInfo = {
-      iti: "",
+      id: "",
       numLayovers: "",
-      layoverAirports: []
+      flightRoute: []
     };
 
-    var flight = flights[i];
-
     var flightId = flight.parentElement.getAttribute("iti");
-    flightInfo.iti = flightId;
+    flightInfo.id = flightId;
 
     var numStopsElem = flight.getElementsByClassName("EIGTDNC-d-Qb")[0];
     if (numStopsElem) {
@@ -64,24 +81,30 @@ function extractFlights() {
       }
     }
 
+    // Create flightRoute Array: init with departing Airport
+    var flightroute = [destination.from];
+
+    // Add Layover airports to flightroute array
     var layoversElem = flight.getElementsByClassName("EIGTDNC-d-Z")[0];
     if (layoversElem) {
       var layoversArray;
 
       if (flightInfo.numLayovers == 1) { // ie. "2h 32m in YYZ"
         layoversArray = layoversElem.innerHTML.split(" ").slice(-1)
-      } else { // ie. 
+      } else { // ie. YVR, YYZ
         layoversArray = layoversElem.innerHTML.split(", ")
       }
-
-      flightInfo.layoverAirports = layoversArray;
+      flightInfo.flightRoute = flightroute.concat(layoversArray);
     }
 
-    // Add flight info to allFlights array
-    flightData.allFlights.push(flightInfo); 
+    // Add arriving Airport at the end
+    flightInfo.flightRoute.push(destination.to);
+
+    // Add flight info to allFlights array  
+    flightResuts.push(flightInfo); 
   }
-  console.log("flightData: ", flightData);
-  return flightData;
+
+  return flightResuts;
 };
 
 function onRequest(request, sender, sendResponse) {
@@ -89,7 +112,7 @@ function onRequest(request, sender, sendResponse) {
     case 'query_flights': 
       console.log("querying flights...");
       // Check if flight info is already there
-      sendResponse(extractFlights());    
+      sendResponse(checkIfResultsLoaded());    
       break;
     case 'process-flights': 
       console.log("processing flights...");
@@ -101,11 +124,3 @@ function onRequest(request, sender, sendResponse) {
 
 ext.runtime.onMessage.addListener(onRequest);
 
-// window.addEventListener ("load", main, false);
-
-// function main (event) {
-
-//   // destinations: { from: string, to: string }
-//   var destinations = getDepartureArrivalAirports();
-//   console.log()
-// }
