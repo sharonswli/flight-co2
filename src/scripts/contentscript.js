@@ -1,53 +1,46 @@
 import ext from "./utils/ext";
 
-var extractTags = () => {
-  var url = document.location.href;
-  if(!url || !url.match(/^http/)) return;
+function getDepartureArrivalAirports() {
+  var urlArray = (document.location.href).split(';');
+  
+  var from = urlArray[1].split('=')[1].split(',');
+  var to = urlArray[2].split('=')[1].split(',');
 
-  var data = {
-    title: "",
-    description: "",
-    url: document.location.href
-  }
+  var departingAirport;
+  var arrivingAirport;
 
-  var ogTitle = document.querySelector("meta[property='og:title']");
-  if(ogTitle) {
-    data.title = ogTitle.getAttribute("content")
-  } else {
-    data.title = document.title
-  }
+  from.length === 1 ? departingAirport = from[0] : departingAirport = 'undefined';
+  to.length === 1 ? arrivingAirport = to[0] : arrivingAirport = 'undefined';
 
-  var descriptionTag = document.querySelector("meta[property='og:description']") || document.querySelector("meta[name='description']")
-  if(descriptionTag) {
-    data.description = descriptionTag.getAttribute("content")
-  }
-
-  return data;
+  return { from: departingAirport, to: arrivingAirport };
 }
 
-var extractFlights = function extractFlights() {
-  var data = {
+
+function extractFlights() {
+  var flightData = {
     departingAirport: "",
     arrivingAirport: "",
     allFlights: [],
     numFlights: ""
   };
 
-  // When the user chooses a specific airport for both the departing and arriving airports, the values are reliably outputted in the URL
-  var urlArray = (document.location.href).split(';');
-  var from = urlArray[1].split('=')[1].split(',');
-  var to = urlArray[2].split('=')[1].split(',');
-
-  if (from.length == 1) {
-    data.departingAirport = from[0];
-  }
-
-  if (to.length == 1) {
-    data.arrivingAirport = to[0];
-  }
-
   var flights = document.querySelectorAll('a.EIGTDNC-d-X');
-  data.numFlights = flights.length;
+
+  // Check if flight infos are completely loaded on DOM  
+  if(flights.length < 1) {
+    console.log("Flights not yet loaded. Aborting...");
+    return;
+  }
+
+  // Load number of flights to flightData object
+  flightData.numFlights = flights.length;
+
+  // Get new destination airports: the values are reliably outputted in the URL
+  var destination = getDepartureArrivalAirports();
+  if(destination && destination.from && destination.to) {
+    flightData.departingAirport = destination.from;
+    flightData.arrivingAirport = destination.to;
+  }
 
   for (var i = 0; i < flights.length; i++) {
     var flightInfo = {
@@ -85,18 +78,34 @@ var extractFlights = function extractFlights() {
     }
 
     // Add flight info to allFlights array
-    data.allFlights.push(flightInfo); 
+    flightData.allFlights.push(flightInfo); 
   }
-
-  return data;
+  console.log("flightData: ", flightData);
+  return flightData;
 };
 
 function onRequest(request, sender, sendResponse) {
-  if (request.action === 'process-page') {
-    sendResponse(extractTags())
-  } else if (request.action === 'process-flights') {
-    sendResponse(extractFlights());
+  switch(request.action) {
+    case 'query_flights': 
+      console.log("querying flights...");
+      // Check if flight info is already there
+      sendResponse(extractFlights());    
+      break;
+    case 'process-flights': 
+      console.log("processing flights...");
+      break;
+    default:
+      console.log("action unknown");
   }
 }
 
 ext.runtime.onMessage.addListener(onRequest);
+
+// window.addEventListener ("load", main, false);
+
+// function main (event) {
+
+//   // destinations: { from: string, to: string }
+//   var destinations = getDepartureArrivalAirports();
+//   console.log()
+// }
