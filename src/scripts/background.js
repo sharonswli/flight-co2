@@ -1,5 +1,4 @@
 import ext from "./utils/ext";
-import {getTotalDistance} from "./utils/calculate-distance";
 import {totalEmissions} from "./utils/co2-emissions-calculation";
 
 ext.runtime.onMessage.addListener(
@@ -24,10 +23,7 @@ ext.runtime.onMessage.addListener(
                 return flightRoute.includes(airport.iata_faa) && airport.iata_faa !== "";
               });
 
-              flight.emissions = totalEmissions(filtered, 'one-way');
-
-              distance = getTotalDistance(filtered);
-              flight.distance = distance;
+              flight.emissions = totalEmissions(filtered);
             }
 
             resp({ action: "have-airports", data: flights });

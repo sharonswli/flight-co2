@@ -84,13 +84,6 @@ var writeToScreen = function writeToScreen(iti, emissions,distance){
     var message = "co2: " + emissions;
     newDiv.appendChild(document.createTextNode(message));
     childElem.appendChild(newDiv);
-
-
-    var newDiv2 = document.createElement("DIV");
-    newDiv2.style.color = "tomato";
-    var message = "distance: " + distance;
-    newDiv2.appendChild(document.createTextNode(message));
-    childElem.appendChild(newDiv2);
   }
 }
 

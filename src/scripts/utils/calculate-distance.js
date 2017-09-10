@@ -23,7 +23,6 @@ function getDistanceCorrection(distance) {
   return distanceCorrectionMap[type];
 }
 
-
 function getGreaterCircleDistance(airportA, airportB) {
   var EARTH_RADIUS = 6371e3; // Earth's radius in meters
 
@@ -39,23 +38,4 @@ function getGreaterCircleDistance(airportA, airportB) {
   return EARTH_RADIUS * c;
 }
 
-// @Input (airports: { id: string, lat: number, long: number }[])
-// @Output (distance: number)
-function getTotalDistance(airports) {
-  return airports.reduce(function(sum, value, index, rawArr) {
-
-    // Check if last item in collection
-    if(index === rawArr.length - 1) {
-      return sum;
-    }
-    var gcdAB = getGreaterCircleDistance(value, rawArr[index + 1]);
-    console.log(`gcd between ${value.id} and ${rawArr[index + 1].id} is: `, gcdAB);
-
-    // get distance correction
-    var offset = getDistanceCorrection(gcdAB);
-    console.log("offset: ", offset);
-    return sum + gcdAB + offset;
-  }, 0);
-}
-
-export { getTotalDistance };
+export { getGreaterCircleDistance, getDistanceCorrection };

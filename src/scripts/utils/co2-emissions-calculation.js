@@ -1,4 +1,4 @@
-import {getTotalDistance} from './calculate-distance';
+import {getGreaterCircleDistance, getDistanceCorrection} from './calculate-distance';
 
 const SHORT_HAUL_MAX_DISTANCE = 1500
 const LONG_HAUL_MIN_DISTANCE = 2500
@@ -24,16 +24,39 @@ var fuel_consumption = function(distance) {
 // we cannot simply double distance for round trip because the relationship between distance and emissions is not linear and because the distance for one way is not necessarily equal to the return distance. Instead, calculate for each way and add the results to get total emissions for return flight
 // @Input = (airports: { id: string, lat: number, long: number }[], tripType: string)
 // @Output = (co2Emissions: number)
-var totalEmissions = function(airports, tripType) {
-  let outboundDistance = getTotalDistance(airports) / 1000;
-  let returnDistance = getTotalDistance(airports.reverse()) / 1000;
+// var totalEmissions = function(airports, tripType) {
+//   let outboundDistance = getTotalDistance(airports) / 1000;
+//   let returnDistance = getTotalDistance(airports.reverse()) / 1000;
 
-  switch(tripType) {
-    case 'one-way':
-      return co2Emissions(outboundDistance);
-    case 'return':
-      return co2Emissions(outboundDistance) + co2Emissions(returnDistance);
-  }
+//   switch(tripType) {
+//     case 'one-way':
+//       return co2Emissions(outboundDistance);
+//     case 'return':
+//       return co2Emissions(outboundDistance) + co2Emissions(returnDistance);
+//   }
+// }
+
+
+// @Input (airports: { id: string, lat: number, long: number }[])
+// @Output (emissions: number)
+function totalEmissions(airports) {
+  return airports.reduce(function(sum, value, index, rawArr) {
+
+    // Check if last item in collection
+    if(index === rawArr.length - 1) {
+      return sum;
+    }
+    var gcdAB = getGreaterCircleDistance(value, rawArr[index + 1]);
+    console.log(`gcd between ${value.id} and ${rawArr[index + 1].id} is: `, gcdAB);
+
+    // get distance correction
+    var offset = getDistanceCorrection(gcdAB);
+    var flightDistance = (gcdAB + offset) / 1000;
+    var flightEmissions = co2Emissions(flightDistance);
+
+    console.log("offset: ", offset);
+    return sum + flightEmissions;
+  }, 0);
 }
 
 // returns emissions for ONE WAY
