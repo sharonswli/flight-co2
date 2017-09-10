@@ -19,7 +19,8 @@ function getDepartureArrivalAirports() {
 function checkIfResultsLoaded() {
   var flights = document.querySelectorAll('a.EIGTDNC-d-X');
   
-  if(!flights.length) {
+  // If flights results are not loaded in DOM, abort
+  if(!flights.length || !flights) {
     console.log("Flights not yet loaded. Aborting...");
     return;
   }
@@ -28,7 +29,6 @@ function checkIfResultsLoaded() {
   const flightResults = extractFlights(flights, destination);
 
   buildResultData(destination, flights.length, flightResults);
-  
 }
 
 function buildResultData(destination, numFlights, flightResults) {
@@ -54,6 +54,7 @@ function buildResultData(destination, numFlights, flightResults) {
     flightData.allFlights = flightResults;
   }
   console.log("flightData: ", flightData);
+  return flightData;
 }
 
 function extractFlights(flights, destination) {  

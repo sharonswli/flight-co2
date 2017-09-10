@@ -31,8 +31,9 @@ var renderMessage = (message) => {
 
 var renderFlights = function renderFlights(data) {
   var displayContainer = document.getElementById("display-container")
+  console.log("data: ", data);
+  
   if (data) {
-    console.log("data: ", data);
     var tmpl = template(data);
     displayContainer.innerHTML = tmpl; 
   } else {
@@ -66,8 +67,4 @@ var optionsLink = document.querySelector(".js-options");
 optionsLink.addEventListener("click", function(e) {
   e.preventDefault();
   ext.tabs.create({'url': ext.extension.getURL('options.html')});
-})
-
-document.addEventListener('DOMContentLoaded', function() {
-  console.log("DOM is loaded");
 })
