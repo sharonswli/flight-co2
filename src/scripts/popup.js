@@ -9,6 +9,7 @@ storage.get('color', function(resp) {
   }
 });
 
+// Return html template with new data
 var template = (data) => {
   var json = JSON.stringify(data);
   return (`
@@ -28,20 +29,10 @@ var renderMessage = (message) => {
   displayContainer.innerHTML = `<p class='message'>${message}</p>`;
 }
 
-var renderBookmark = (data) => {
-  var displayContainer = document.getElementById("display-container")
-  if(data) {
-    var tmpl = template(data);
-    displayContainer.innerHTML = tmpl;  
-  } else {
-    renderMessage("Sorry, could not extract this page's title and URL")
-  }
-}
-
 var renderFlights = function renderFlights(data) {
   var displayContainer = document.getElementById("display-container")
   if (data) {
-    console.log(data);
+    console.log("data: ", data);
     var tmpl = template(data);
     displayContainer.innerHTML = tmpl; 
   } else {
@@ -75,4 +66,8 @@ var optionsLink = document.querySelector(".js-options");
 optionsLink.addEventListener("click", function(e) {
   e.preventDefault();
   ext.tabs.create({'url': ext.extension.getURL('options.html')});
+})
+
+document.addEventListener('DOMContentLoaded', function() {
+  console.log("DOM is loaded");
 })
