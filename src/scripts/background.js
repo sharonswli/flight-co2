@@ -11,11 +11,24 @@ ext.runtime.onMessage.addListener(
   }
 );
 
-chrome.webRequest.onCompleted.addListener(function (tabId, changeInfo, tab) {
+chrome.webRequest.onCompleted.addListener(function(requestInfo) {
   console.log("some request completed");
+  // Tell contentScript to checkIfFlightInfos
+  chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
+    if(tabs && tabs[0] && tabs[0].id) {
+      chrome.tabs.sendMessage(tabs[0].id, { action: "query_flights" });    
+    }
+  })
 },
 {
-  urls: ["https://*.google.com/*.js"]
+  urls: ["https://*.google.com/flights/rpc", "https://*.google.ca/flights/rpc", "https://*.google.ca/*.js", "https://*.google.com/*.js"]
  },
  ["responseHeaders"]);
 
+
+//  chrome.tabs.onUpdated.addListener(function(tabId, info) {
+//   if(info.status === 'complete') {
+//     console.log("info is complete");
+//   } 
+//   console.log("tab is updated");
+// });
