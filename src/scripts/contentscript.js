@@ -1,4 +1,5 @@
 import ext from "./utils/ext";
+import getTotalDistance from "./utils/calculate-distance";
 
 var extractTags = () => {
   var url = document.location.href;
@@ -46,6 +47,8 @@ function getData(airports){
           return airports.includes(airport.iata_faa);
         });
         console.log(filtered)
+        distance = getTotalDistance(filtered);
+        console.log(distance);
       }
   };
   xhr.send();
