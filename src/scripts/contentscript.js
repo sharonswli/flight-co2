@@ -51,6 +51,8 @@ var extractFlights = function extractFlights() {
 
     var flightroute = [data.departingAirport];
 
+    flightInfo.flightRoute = flightroute
+
     var layoversElem = flight.getElementsByClassName("EIGTDNC-d-Z")[0];
     if (layoversElem) {
       var layoversArray;
@@ -73,15 +75,22 @@ var extractFlights = function extractFlights() {
   return data;
 };
 
-var writeToScreen = function writeToScreen(iti, message){
+var writeToScreen = function writeToScreen(iti, emissions,distance){
   if (iti !== null) {
     var parentElem = document.querySelectorAll('[iti="'+iti+'"]')[0];
     var childElem = parentElem.getElementsByClassName("EIGTDNC-d-Sb")[0];
     var newDiv = document.createElement("DIV");
     newDiv.style.color = "tomato";
-    message = "co2: " + message;
+    var message = "co2: " + emissions;
     newDiv.appendChild(document.createTextNode(message));
     childElem.appendChild(newDiv);
+
+
+    var newDiv2 = document.createElement("DIV");
+    newDiv2.style.color = "tomato";
+    var message = "distance: " + distance;
+    newDiv2.appendChild(document.createTextNode(message));
+    childElem.appendChild(newDiv2);
   }
 }
 
@@ -90,7 +99,7 @@ function onRequest(request, sender, sendResponse) {
     sendResponse(extractFlights());
   } else if (request.action === 'insert-content') {
     for (var i=0; i<request.data.length; i++) {
-      writeToScreen(request.data[i].iti, request.data[i].emissions);
+      writeToScreen(request.data[i].iti, request.data[i].emissions, request.data[i].distance);
     }
   }
 }

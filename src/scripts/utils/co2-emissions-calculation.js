@@ -71,4 +71,4 @@ var linearApproximation = function(distance, original_function) {
   return slope * distance + y_intercept;
 }
 
-export { co2Emissions };
+export { totalEmissions };
