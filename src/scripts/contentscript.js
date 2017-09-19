@@ -6,8 +6,8 @@ function getDepartureArrivalAirports() {
   var from = urlArray[1].split('=')[1].split(',');
   var to = urlArray[2].split('=')[1].split(',');
 
-  var departingAirport;
-  var arrivingAirport;
+  let departingAirport;
+  let arrivingAirport;
 
   // TODO: handle 'all airports' selection  
   from.length === 1 ? departingAirport = from[0] : departingAirport = 'undefined';
@@ -28,7 +28,7 @@ function checkIfResultsLoaded() {
   const destination = getDepartureArrivalAirports();
   const flightResults = extractFlights(flights, destination);
 
-  buildResultData(destination, flights.length, flightResults);
+  return buildResultData(destination, flights.length, flightResults);
 }
 
 function buildResultData(destination, numFlights, flightResults) {
