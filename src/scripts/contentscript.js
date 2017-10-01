@@ -139,22 +139,26 @@ function extractFlights(flights, destination) {
 
 var writeToScreen = function writeToScreen(iti, emissions,distance){
   if (iti) {
-    var parentElem = document.querySelectorAll('[iti="'+iti+'"]')[0];
-    var childElem = parentElem.getElementsByClassName("DQX2Q1B-d-Sb")[0];
+    var flightEntry = document.querySelectorAll('[iti="'+iti+'"]')[0];
+    var stopsColumn = flightEntry.getElementsByClassName("DQX2Q1B-d-Sb")[0];
+
+    if(stopsColumn) {
+      let existingEmissionData = stopsColumn.getElementsByClassName("co2-emission");
+      
+      if (existingEmissionData && existingEmissionData.length > 0) {
+        // stopsColumn.removeChild(existingEmissionData);
+        for (let i = 0, n = existingEmissionData.length; i < n; i++) {
+          existingEmissionData[i].remove();
+        }
+      }
+    }
 
     // Create new text node: Assing className 'co2-emission' and style
     var newDiv = document.createElement("DIV");
     newDiv.className = "co2-emission";
     newDiv.style.color = "rgb(18, 177, 74)";
     newDiv.appendChild(document.createTextNode(`co2e(kg): ${emissions}`));
-
-    if(childElem) {
-      let existingEmissionData = childElem.getElementsByClassName("co2-emission");
-      if (existingEmissionData && existingEmissionData.length > 0) {
-        childElem.removeChild(existingEmissionData);
-      }
-      childElem.appendChild(newDiv);
-    }
+    stopsColumn.appendChild(newDiv);
   }
 }
 
