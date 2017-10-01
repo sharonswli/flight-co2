@@ -126,18 +126,22 @@ function extractFlights(flights, destination) {
   return flightResuts;
 };
 
-var writeToScreen = function writeToScreen(iti, emissions,distance){
+var writeToScreen = function writeToScreen(iti, emissions, distance, index){
   if (iti) {
     var parentElem = document.querySelectorAll('[iti="'+iti+'"]')[0];
-    var childElem = parentElem.getElementsByClassName("DQX2Q1B-d-Sb")[0];
-    var newDiv = document.createElement("DIV");
-    newDiv.style.color = "tomato";
-    var message = "co2: " + emissions;
-    newDiv.appendChild(document.createTextNode(message));
-    if(childElem) {
-      childElem.appendChild(newDiv);
-  
-    }
+  } else {
+    // This covers the edge case where one (assumed) div does not have an iti
+    var problemElem = document.querySelectorAll('a.DQX2Q1B-d-X')[index];
+    var parentElem = problemElem.parentElement;
+  }
+
+  var childElem = parentElem.getElementsByClassName("DQX2Q1B-d-Sb")[0];
+  var newDiv = document.createElement("DIV");
+  newDiv.style.color = "tomato";
+  var message = "co2: " + emissions;
+  newDiv.appendChild(document.createTextNode(message));
+  if (childElem) {
+    childElem.appendChild(newDiv);
   }
 }
 
@@ -154,7 +158,7 @@ function onRequest(request, sender, sendResponse) {
       break;
     case 'insert-content':
       for (var i=0; i<request.data.length; i++) {
-        writeToScreen(request.data[i].id, request.data[i].emissions, request.data[i].distance);
+        writeToScreen(request.data[i].id, request.data[i].emissions, request.data[i].distance, i);
       }
     break;
     default:
