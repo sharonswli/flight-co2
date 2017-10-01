@@ -76,7 +76,7 @@ function processResultData(flightData) {
       //   chrome.tabs.sendMessage(activeTab.id, { action: 'insert-content', data: response.data });
       // });
       for (var i=0; i < response.data.length; i++) {
-        writeToScreen(response.data[i].id, response.data[i].emissions, response.data[i].distance);
+        writeToScreen(response.data[i].id, response.data[i].emissions, response.data[i].distance, i);
       }
     } else {
       // renderMessage("Sorry, there was an error.");
@@ -141,14 +141,10 @@ var writeToScreen = function writeToScreen(iti, emissions, distance, index){
   let flightEntry;
 
   if (iti) {
-    console.log("case iti is defined: ", iti);
     flightEntry = document.querySelectorAll('[iti="'+iti+'"]')[0];
   } else {
     // This covers the edge case where one (assumed) div does not have an iti
-    console.log("index:", index);
-    console.log('query: ', document.querySelectorAll('a.DQX2Q1B-d-X'));
     var problemElem = document.querySelectorAll('a.DQX2Q1B-d-X')[index];
-    console.log("problemElem: ", problemElem);
     if(problemElem) {
       flightEntry = problemElem.parentElement;    
     }
@@ -190,18 +186,18 @@ function onRequest(request, sender, sendResponse) {
         // sendResponse(buildResultData(flights));
       } 
       break;
-    case 'process-flights': 
-      console.warn("processing flights...");
-      flights = checkIfResultsLoaded();
-      if(flights && flights.length > 0) {
-        sendResponse(buildResultData(flights));
-      } 
-      break;
-    case 'insert-content':
-      for (var i=0; i<request.data.length; i++) {
-        writeToScreen(request.data[i].id, request.data[i].emissions, request.data[i].distance, i);
-      }
-    break;
+    // case 'process-flights': 
+    //   console.warn("processing flights...");
+    //   flights = checkIfResultsLoaded();
+    //   if(flights && flights.length > 0) {
+    //     sendResponse(buildResultData(flights));
+    //   } 
+    //   break;
+    // case 'insert-content':
+    //   for (var i=0; i<request.data.length; i++) {
+    //     writeToScreen(request.data[i].id, request.data[i].emissions, request.data[i].distance, i);
+    //   }
+    // break;
     default:
       console.log("action unknown");
   }
