@@ -144,15 +144,13 @@ var writeToScreen = function writeToScreen(iti, emissions,distance){
 function onRequest(request, sender, sendResponse) {
   switch(request.action) {
     case 'query_flights': 
-      console.log("querying flights...");
+      console.warn("querying flights...");
       // Check if flight info is already there
       sendResponse(checkIfResultsLoaded());  
       break;
     case 'process-flights': 
       console.warn("processing flights...");
       sendResponse(checkIfResultsLoaded())
-      // console.log("buildResultData(): ", buildResultData());
-      // sendResponse(buildResultData());
       break;
     case 'insert-content':
       for (var i=0; i<request.data.length; i++) {
