@@ -2,14 +2,14 @@ import ext from "./utils/ext";
 
 function getDepartureArrivalAirports() {
   var urlArray = (document.location.href).split(';');
-  
+
   var from = urlArray[1].split('=')[1].split(',');
   var to = urlArray[2].split('=')[1].split(',');
 
   let departingAirport;
   let arrivingAirport;
 
-  // TODO: handle 'all airports' selection  
+  // TODO: handle 'all airports' selection
   from.length === 1 ? departingAirport = from[0] : departingAirport = 'undefined';
   to.length === 1 ? arrivingAirport = to[0] : arrivingAirport = 'undefined';
 
@@ -18,13 +18,13 @@ function getDepartureArrivalAirports() {
 
 function checkIfResultsLoaded() {
   var flights = document.querySelectorAll('a.DQX2Q1B-d-X');
-  
+
   // If flights results are not loaded in DOM, abort
   if(!flights.length || !flights) {
     console.log("Flights not yet loaded. Aborting...");
     return;
   }
-  // If results are loaded: 
+  // If results are loaded:
   const destination = getDepartureArrivalAirports();
   const flightResults = extractFlights(flights, destination);
 
@@ -43,7 +43,7 @@ function buildResultData(destination, numFlights, flightResults) {
     allFlights: [],
     numFlights: null
   };
-  
+
   // Input departingAirport and arrivingAirport data
   if(destination && destination.from && destination.to) {
     flightData.departingAirport = destination.from;
@@ -62,13 +62,13 @@ function buildResultData(destination, numFlights, flightResults) {
   return flightData;
 }
 
-function extractFlights(flights, destination) {  
-  
+function extractFlights(flights, destination) {
+
   const flightResuts = [];
   // Get allFlights Array
   for (var i = 0; i < flights.length; i++) {
     var flight = flights[i];
-    
+
     var flightInfo = {
       id: "",
       numLayovers: "",
@@ -111,8 +111,8 @@ function extractFlights(flights, destination) {
     // Add arriving Airport at the end
     flightInfo.flightRoute.push(destination.to);
 
-    // Add flight info to allFlights array  
-    flightResuts.push(flightInfo); 
+    // Add flight info to allFlights array
+    flightResuts.push(flightInfo);
 
     //   flightInfo.flightRoute = flightroute.concat(layoversArray);
     // }
@@ -120,41 +120,43 @@ function extractFlights(flights, destination) {
     // flightInfo.flightRoute.push(data.arrivingAirport);
 
     // // Add flight info to allFlights array
-    // data.allFlights.push(flightInfo); 
+    // data.allFlights.push(flightInfo);
   }
 
   return flightResuts;
 };
 
-var writeToScreen = function writeToScreen(iti, emissions,distance){
+var writeToScreen = function writeToScreen(iti, emissions, related){
   if (iti) {
     var parentElem = document.querySelectorAll('[iti="'+iti+'"]')[0];
     var childElem = parentElem.getElementsByClassName("DQX2Q1B-d-Sb")[0];
     var newDiv = document.createElement("DIV");
     newDiv.style.color = "tomato";
     var message = "co2: " + emissions;
+    var related = "bananas: " + related;
     newDiv.appendChild(document.createTextNode(message));
+    newDiv.appendChild(document.createTextNode(related));
     if(childElem) {
       childElem.appendChild(newDiv);
-  
+
     }
   }
 }
 
 function onRequest(request, sender, sendResponse) {
   switch(request.action) {
-    case 'query_flights': 
+    case 'query_flights':
       console.warn("querying flights...");
       // Check if flight info is already there
-      sendResponse(checkIfResultsLoaded());  
+      sendResponse(checkIfResultsLoaded());
       break;
-    case 'process-flights': 
+    case 'process-flights':
       console.warn("processing flights...");
       sendResponse(checkIfResultsLoaded())
       break;
     case 'insert-content':
       for (var i=0; i<request.data.length; i++) {
-        writeToScreen(request.data[i].id, request.data[i].emissions, request.data[i].distance);
+        writeToScreen(request.data[i].id, request.data[i].emissions, request.data[i].related);
       }
     break;
     default:

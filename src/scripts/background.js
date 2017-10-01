@@ -1,12 +1,18 @@
 import ext from "./utils/ext";
 import {totalEmissions} from "./utils/co2-emissions-calculation";
+import {data} from "../data/co2_relating";
+import {convertCO2} from "./utils/convert";
 
 ext.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
     var resp = sendResponse
     if (request.action === "get-airports") {
       var requestData = JSON.parse(request.data);
-      var flights = requestData.allFlights; 
+      var flights = requestData.allFlights;
+      var relateToLabel = "a banana";
+      var relateTo = data.filter(function(item){
+        return item.label === relateToLabel;
+      })
       var distance;
 
       var xhr = new XMLHttpRequest();
@@ -24,11 +30,12 @@ ext.runtime.onMessage.addListener(
               });
 
               flight.emissions = totalEmissions(filtered);
+              flight.related = convertCO2(flight.emissions, relateTo[0].CO2e);
             }
 
             resp({ action: "have-airports", data: flights });
           }
-          
+
       };
       xhr.send();
       return true;
@@ -41,7 +48,7 @@ chrome.webRequest.onCompleted.addListener(function(requestInfo) {
   // Tell contentScript to checkIfFlightInfos
   chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
     if(tabs && tabs[0] && tabs[0].id) {
-      chrome.tabs.sendMessage(tabs[0].id, { action: "query_flights" });    
+      chrome.tabs.sendMessage(tabs[0].id, { action: "query_flights" });
     }
   })
 },
@@ -54,6 +61,6 @@ chrome.webRequest.onCompleted.addListener(function(requestInfo) {
 //  chrome.tabs.onUpdated.addListener(function(tabId, info) {
 //   if(info.status === 'complete') {
 //     console.log("info is complete");
-//   } 
+//   }
 //   console.log("tab is updated");
 // });
