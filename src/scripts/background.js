@@ -30,6 +30,7 @@ ext.runtime.onMessage.addListener(
               });
 
               flight.emissions = totalEmissions(filtered);
+              flight.relatedTo = relateTo[0].label;
               flight.related = convertCO2(flight.emissions, relateTo[0].CO2e);
             }
 

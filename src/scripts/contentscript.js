@@ -126,15 +126,15 @@ function extractFlights(flights, destination) {
   return flightResuts;
 };
 
-var writeToScreen = function writeToScreen(iti, emissions, related){
+var writeToScreen = function writeToScreen(iti, emissions, relatedTo, related){
   if (iti) {
     var parentElem = document.querySelectorAll('[iti="'+iti+'"]')[0];
     var childElem = parentElem.getElementsByClassName("DQX2Q1B-d-Sb")[0];
     var newDiv = document.createElement("DIV");
     newDiv.style.color = "tomato";
     var message = "co2: " + emissions;
-    var related = "bananas: " + related;
-    newDiv.appendChild(document.createTextNode(message));
+    var related = `${related} times ${relatedTo}`;
+    // newDiv.appendChild(document.createTextNode(message));
     newDiv.appendChild(document.createTextNode(related));
     if(childElem) {
       childElem.appendChild(newDiv);
@@ -156,7 +156,7 @@ function onRequest(request, sender, sendResponse) {
       break;
     case 'insert-content':
       for (var i=0; i<request.data.length; i++) {
-        writeToScreen(request.data[i].id, request.data[i].emissions, request.data[i].related);
+        writeToScreen(request.data[i].id, request.data[i].emissions, request.data[i].relatedTo, request.data[i].related);
       }
     break;
     default:
