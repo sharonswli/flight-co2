@@ -137,29 +137,43 @@ function extractFlights(flights, destination) {
   return flightResuts;
 };
 
-var writeToScreen = function writeToScreen(iti, emissions,distance){
-  if (iti) {
-    var flightEntry = document.querySelectorAll('[iti="'+iti+'"]')[0];
-    var stopsColumn = flightEntry.getElementsByClassName("DQX2Q1B-d-Sb")[0];
+var writeToScreen = function writeToScreen(iti, emissions, distance, index){
+  let flightEntry;
 
-    if(stopsColumn) {
-      let existingEmissionData = stopsColumn.getElementsByClassName("co2-emission");
-      
-      if (existingEmissionData && existingEmissionData.length > 0) {
-        // stopsColumn.removeChild(existingEmissionData);
-        for (let i = 0, n = existingEmissionData.length; i < n; i++) {
-          existingEmissionData[i].remove();
-        }
+  if (iti) {
+    console.log("case iti is defined: ", iti);
+    flightEntry = document.querySelectorAll('[iti="'+iti+'"]')[0];
+  } else {
+    // This covers the edge case where one (assumed) div does not have an iti
+    console.log("index:", index);
+    console.log('query: ', document.querySelectorAll('a.DQX2Q1B-d-X'));
+    var problemElem = document.querySelectorAll('a.DQX2Q1B-d-X')[index];
+    console.log("problemElem: ", problemElem);
+    if(problemElem) {
+      flightEntry = problemElem.parentElement;    
+    }
+  }
+
+  var stopsColumn = flightEntry.getElementsByClassName("DQX2Q1B-d-Sb")[0];
+
+  if(stopsColumn) {
+    let existingEmissionData = stopsColumn.getElementsByClassName("co2-emission");
+    
+    if (existingEmissionData && existingEmissionData.length > 0) {
+      // stopsColumn.removeChild(existingEmissionData);
+      for (let i = 0, n = existingEmissionData.length; i < n; i++) {
+        existingEmissionData[i].remove();
       }
     }
-
-    // Create new text node: Assing className 'co2-emission' and style
-    var newDiv = document.createElement("DIV");
-    newDiv.className = "co2-emission";
-    newDiv.style.color = "rgb(18, 177, 74)";
-    newDiv.appendChild(document.createTextNode(`co2e(kg): ${emissions}`));
-    stopsColumn.appendChild(newDiv);
   }
+
+  // Create new text node: Assing className 'co2-emission' and style
+  var newDiv = document.createElement("DIV");
+  newDiv.className = "co2-emission";
+  newDiv.style.color = "rgb(18, 177, 74)";
+  newDiv.appendChild(document.createTextNode(`co2e(kg): ${emissions}`));
+  stopsColumn.appendChild(newDiv);
+  
 }
 
 function onRequest(request, sender, sendResponse) {
@@ -185,7 +199,7 @@ function onRequest(request, sender, sendResponse) {
       break;
     case 'insert-content':
       for (var i=0; i<request.data.length; i++) {
-        writeToScreen(request.data[i].id, request.data[i].emissions, request.data[i].distance);
+        writeToScreen(request.data[i].id, request.data[i].emissions, request.data[i].distance, i);
       }
     break;
     default:
