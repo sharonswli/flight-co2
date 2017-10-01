@@ -25,11 +25,7 @@ function checkIfResultsLoaded() {
     return;
   }
   return flights;
-  // // If results are loaded: 
-  // const destination = getDepartureArrivalAirports();
-  // const flightResults = extractFlights(flights, destination);
 
-  // return buildResultData(destination, flights.length, flightResults);
 }
 
 
@@ -167,7 +163,7 @@ var writeToScreen = function writeToScreen(iti, emissions, distance, index){
   var newDiv = document.createElement("DIV");
   newDiv.className = "co2-emission";
   newDiv.style.color = "rgb(18, 177, 74)";
-  newDiv.appendChild(document.createTextNode(`co2e(kg): ${emissions}`));
+  newDiv.appendChild(document.createTextNode(`co2e(kg): ${Math.round(emissions * 100)/100}`));
   stopsColumn.appendChild(newDiv);
   
 }
