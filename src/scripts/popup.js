@@ -51,7 +51,7 @@ var renderMessage = (message) => {
 
 var renderFlights = function renderFlights(data) {
   var displayContainer = document.getElementById("display-container")
-  
+  console.log("renderFlights data: ", data);
   if (data) {
     var tmpl = template(data);
     displayContainer.innerHTML = tmpl; 
