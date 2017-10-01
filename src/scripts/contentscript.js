@@ -6,8 +6,8 @@ function getDepartureArrivalAirports() {
   var from = urlArray[1].split('=')[1].split(',');
   var to = urlArray[2].split('=')[1].split(',');
 
-  var departingAirport;
-  var arrivingAirport;
+  let departingAirport;
+  let arrivingAirport;
 
   // TODO: handle 'all airports' selection  
   from.length === 1 ? departingAirport = from[0] : departingAirport = 'undefined';
@@ -17,7 +17,7 @@ function getDepartureArrivalAirports() {
 }
 
 function checkIfResultsLoaded() {
-  var flights = document.querySelectorAll('a.EIGTDNC-d-X');
+  var flights = document.querySelectorAll('a.DQX2Q1B-d-X');
   
   // If flights results are not loaded in DOM, abort
   if(!flights.length || !flights) {
@@ -28,13 +28,18 @@ function checkIfResultsLoaded() {
   const destination = getDepartureArrivalAirports();
   const flightResults = extractFlights(flights, destination);
 
-  buildResultData(destination, flights.length, flightResults);
+  return buildResultData(destination, flights.length, flightResults);
 }
 
 function buildResultData(destination, numFlights, flightResults) {
+  // console.log("build: destionation: ", destination);
+  // console.log("build: numFlights: ", numFlights);
+  // console.log("build :flightResults: ", flightResults);
+
   const flightData = {
     departingAirport: "",
     arrivingAirport: "",
+    airports: [],
     allFlights: [],
     numFlights: null
   };
@@ -58,6 +63,7 @@ function buildResultData(destination, numFlights, flightResults) {
 }
 
 function extractFlights(flights, destination) {  
+  
   const flightResuts = [];
   // Get allFlights Array
   for (var i = 0; i < flights.length; i++) {
@@ -72,7 +78,7 @@ function extractFlights(flights, destination) {
     var flightId = flight.parentElement.getAttribute("iti");
     flightInfo.id = flightId;
 
-    var numStopsElem = flight.getElementsByClassName("EIGTDNC-d-Qb")[0];
+    var numStopsElem = flight.getElementsByClassName("DQX2Q1B-d-Qb")[0];
     if (numStopsElem) {
       var numStopsSplit = numStopsElem.innerHTML.split(" ");;
       if (numStopsSplit[0] == 'Nonstop') {
@@ -85,8 +91,12 @@ function extractFlights(flights, destination) {
     // Create flightRoute Array: init with departing Airport
     var flightroute = [destination.from];
 
-    // Add Layover airports to flightroute array
-    var layoversElem = flight.getElementsByClassName("EIGTDNC-d-Z")[0];
+    // // Add Layover airports to flightroute array
+    // var flightroute = [data.departingAirport];
+
+    flightInfo.flightRoute = flightroute
+
+    var layoversElem = flight.getElementsByClassName("DQX2Q1B-d-Z")[0];
     if (layoversElem) {
       var layoversArray;
 
@@ -103,25 +113,53 @@ function extractFlights(flights, destination) {
 
     // Add flight info to allFlights array  
     flightResuts.push(flightInfo); 
+
+    //   flightInfo.flightRoute = flightroute.concat(layoversArray);
+    // }
+
+    // flightInfo.flightRoute.push(data.arrivingAirport);
+
+    // // Add flight info to allFlights array
+    // data.allFlights.push(flightInfo); 
   }
 
   return flightResuts;
 };
 
+var writeToScreen = function writeToScreen(iti, emissions,distance){
+  if (iti) {
+    var parentElem = document.querySelectorAll('[iti="'+iti+'"]')[0];
+    var childElem = parentElem.getElementsByClassName("DQX2Q1B-d-Sb")[0];
+    var newDiv = document.createElement("DIV");
+    newDiv.style.color = "tomato";
+    var message = "co2: " + emissions;
+    newDiv.appendChild(document.createTextNode(message));
+    if(childElem) {
+      childElem.appendChild(newDiv);
+  
+    }
+  }
+}
+
 function onRequest(request, sender, sendResponse) {
   switch(request.action) {
     case 'query_flights': 
-      console.log("querying flights...");
+      console.warn("querying flights...");
       // Check if flight info is already there
-      sendResponse(checkIfResultsLoaded());    
+      sendResponse(checkIfResultsLoaded());  
       break;
     case 'process-flights': 
-      console.log("processing flights...");
+      console.warn("processing flights...");
+      sendResponse(checkIfResultsLoaded())
       break;
+    case 'insert-content':
+      for (var i=0; i<request.data.length; i++) {
+        writeToScreen(request.data[i].id, request.data[i].emissions, request.data[i].distance);
+      }
+    break;
     default:
       console.log("action unknown");
   }
 }
 
 ext.runtime.onMessage.addListener(onRequest);
-

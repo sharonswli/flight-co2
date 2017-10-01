@@ -43,7 +43,8 @@
     },
     "default_title": "CO2 Info on your Selected Flight",
     "default_popup": "popup.html"
-  }
+  },
+  "web_accessible_resources": [
+    "data/airport-data.json"
+  ]
 }
-
-
