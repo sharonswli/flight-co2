@@ -17,7 +17,7 @@ function getDepartureArrivalAirports() {
 }
 
 function checkIfResultsLoaded() {
-  var flights = document.querySelectorAll('a.EIGTDNC-d-X');
+  var flights = document.querySelectorAll('a.DQX2Q1B-d-X');
   
   // If flights results are not loaded in DOM, abort
   if(!flights.length || !flights) {
@@ -35,6 +35,7 @@ function buildResultData(destination, numFlights, flightResults) {
   const flightData = {
     departingAirport: "",
     arrivingAirport: "",
+    airports: [],
     allFlights: [],
     numFlights: null
   };
@@ -58,6 +59,7 @@ function buildResultData(destination, numFlights, flightResults) {
 }
 
 function extractFlights(flights, destination) {  
+  
   const flightResuts = [];
   // Get allFlights Array
   for (var i = 0; i < flights.length; i++) {
@@ -72,7 +74,7 @@ function extractFlights(flights, destination) {
     var flightId = flight.parentElement.getAttribute("iti");
     flightInfo.id = flightId;
 
-    var numStopsElem = flight.getElementsByClassName("EIGTDNC-d-Qb")[0];
+    var numStopsElem = flight.getElementsByClassName("DQX2Q1B-d-Sb")[0];
     if (numStopsElem) {
       var numStopsSplit = numStopsElem.innerHTML.split(" ");;
       if (numStopsSplit[0] == 'Nonstop') {
@@ -85,8 +87,12 @@ function extractFlights(flights, destination) {
     // Create flightRoute Array: init with departing Airport
     var flightroute = [destination.from];
 
-    // Add Layover airports to flightroute array
-    var layoversElem = flight.getElementsByClassName("EIGTDNC-d-Z")[0];
+    // // Add Layover airports to flightroute array
+    // var flightroute = [data.departingAirport];
+
+    flightInfo.flightRoute = flightroute
+
+    var layoversElem = flight.getElementsByClassName("DQX2Q1B-d-Z")[0];
     if (layoversElem) {
       var layoversArray;
 
@@ -103,10 +109,30 @@ function extractFlights(flights, destination) {
 
     // Add flight info to allFlights array  
     flightResuts.push(flightInfo); 
+
+    //   flightInfo.flightRoute = flightroute.concat(layoversArray);
+    // }
+
+    // flightInfo.flightRoute.push(data.arrivingAirport);
+
+    // // Add flight info to allFlights array
+    // data.allFlights.push(flightInfo); 
   }
 
   return flightResuts;
 };
+
+var writeToScreen = function writeToScreen(iti, emissions,distance){
+  if (iti !== null) {
+    var parentElem = document.querySelectorAll('[iti="'+iti+'"]')[0];
+    var childElem = parentElem.getElementsByClassName("DQX2Q1B-d-Sb")[0];
+    var newDiv = document.createElement("DIV");
+    newDiv.style.color = "tomato";
+    var message = "co2: " + emissions;
+    newDiv.appendChild(document.createTextNode(message));
+    childElem.appendChild(newDiv);
+  }
+}
 
 function onRequest(request, sender, sendResponse) {
   switch(request.action) {
@@ -118,10 +144,14 @@ function onRequest(request, sender, sendResponse) {
     case 'process-flights': 
       console.log("processing flights...");
       break;
+    case 'insert-content':
+      for (var i=0; i<request.data.length; i++) {
+        writeToScreen(request.data[i].iti, request.data[i].emissions, request.data[i].distance);
+      }
+    break;
     default:
       console.log("action unknown");
   }
 }
 
 ext.runtime.onMessage.addListener(onRequest);
-
