@@ -7,12 +7,14 @@ ext.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
     var resp = sendResponse
     if (request.action === "get-airports") {
-      var requestData = JSON.parse(request.data);
+      var requestData = JSON.parse(request.data.flightsData);
       var flights = requestData.allFlights;
-      var relateToLabel = "a banana";
-      var relateTo = data.filter(function(item){
-        return item.label === relateToLabel;
-      })
+      var relateToLabel = request.data.relateToLabel;
+      if (relateToLabel) {
+        var relateTo = data.filter(function(item){
+          return item.label === relateToLabel;
+        })
+      }
       var distance;
 
       var xhr = new XMLHttpRequest();
@@ -30,8 +32,10 @@ ext.runtime.onMessage.addListener(
               });
 
               flight.emissions = totalEmissions(filtered);
-              flight.relatedTo = relateTo[0].label;
-              flight.related = convertCO2(flight.emissions, relateTo[0].CO2e);
+              if (relateToLabel) {
+                flight.relatedTo = relateToLabel;
+                flight.related = convertCO2(flight.emissions, relateTo[0].CO2e);
+              }
             }
 
             resp({ action: "have-airports", data: flights });

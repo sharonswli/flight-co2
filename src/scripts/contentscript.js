@@ -126,16 +126,20 @@ function extractFlights(flights, destination) {
   return flightResuts;
 };
 
-var writeToScreen = function writeToScreen(iti, emissions, relatedTo, related){
+var writeToScreen = function writeToScreen(iti, emissions, relatedTo, converted){
   if (iti) {
     var parentElem = document.querySelectorAll('[iti="'+iti+'"]')[0];
     var childElem = parentElem.getElementsByClassName("DQX2Q1B-d-Sb")[0];
     var newDiv = document.createElement("DIV");
     newDiv.style.color = "tomato";
     var message = "co2: " + emissions;
-    var related = `${related} times ${relatedTo}`;
-    // newDiv.appendChild(document.createTextNode(message));
-    newDiv.appendChild(document.createTextNode(related));
+    var related = `${converted} times  ${relatedTo}`;
+    if (!relatedTo) {
+      newDiv.appendChild(document.createTextNode(message));
+    }
+    else {
+      newDiv.appendChild(document.createTextNode(related));
+    }
     if(childElem) {
       childElem.appendChild(newDiv);
 

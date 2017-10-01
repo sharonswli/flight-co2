@@ -34,13 +34,11 @@ var template = (data) => {
   var json = JSON.stringify(data);
   return (`
   <div class="site-description">
-    <h3 class="title">${data.title}</h3>
-    <p class="description">${data.description}</p>
-    <p>Flights evaluated: ${data.numFlights}</p>
-    <a href="${data.url}" target="_blank" class="url">${data.url}</a>
-  </div>
+    <h3 class="title"> ${data.numFlights}</h3>
   <div class="action-container">
-    <button data-bookmark='${json}' id="save-btn" class="btn btn-primary">Save</button>
+    <button data-bookmark='${json}' class="btn btn-primary calculate">Default</button>
+    <button data-bookmark='${json}' data-label="a banana" class="btn btn-primary calculate">Bananas</button>
+    <button data-bookmark='${json}' data-label="a year of hand drying" class="btn btn-primary calculate">Year of hand drying</button>
   </div>
   `);
 }
@@ -51,10 +49,10 @@ var renderMessage = (message) => {
 
 var renderFlights = function renderFlights(data) {
   var displayContainer = document.getElementById("display-container")
-  
+
   if (data) {
     var tmpl = template(data);
-    displayContainer.innerHTML = tmpl; 
+    displayContainer.innerHTML = tmpl;
   } else {
     renderMessage("Sorry, could not extract flight information")
   }
@@ -67,14 +65,18 @@ ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
 });
 
 popup.addEventListener("click", function(e) {
-  if (e.target && e.target.matches("#save-btn")) {
+
     e.preventDefault();
-    var data = e.target.getAttribute("data-bookmark"); 
+    var data = {"flightsData": e.target.getAttribute("data-bookmark")};
+    if (e.target.getAttribute("data-label")) {
+      data.relateToLabel = e.target.getAttribute("data-label");
+    }
+
     ext.runtime.sendMessage({ action: "get-airports", data: data }, function(response) {
       if (response && response.action === "have-airports") {
         console.log("have-airport response:", response);
         renderMessage("have airports");
-        
+
         ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
           var activeTab = tabs[0];
           // Output # of flights
@@ -84,7 +86,7 @@ popup.addEventListener("click", function(e) {
         renderMessage("Sorry, there was an error.");
       }
     })
-  }
+
 });
 
 var optionsLink = document.querySelector(".js-options");
