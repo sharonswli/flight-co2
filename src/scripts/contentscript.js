@@ -32,6 +32,10 @@ function checkIfResultsLoaded() {
 }
 
 function buildResultData(destination, numFlights, flightResults) {
+  // console.log("build: destionation: ", destination);
+  // console.log("build: numFlights: ", numFlights);
+  // console.log("build :flightResults: ", flightResults);
+
   const flightData = {
     departingAirport: "",
     arrivingAirport: "",
@@ -74,7 +78,7 @@ function extractFlights(flights, destination) {
     var flightId = flight.parentElement.getAttribute("iti");
     flightInfo.id = flightId;
 
-    var numStopsElem = flight.getElementsByClassName("DQX2Q1B-d-Sb")[0];
+    var numStopsElem = flight.getElementsByClassName("DQX2Q1B-d-Qb")[0];
     if (numStopsElem) {
       var numStopsSplit = numStopsElem.innerHTML.split(" ");;
       if (numStopsSplit[0] == 'Nonstop') {
@@ -123,14 +127,17 @@ function extractFlights(flights, destination) {
 };
 
 var writeToScreen = function writeToScreen(iti, emissions,distance){
-  if (iti !== null) {
+  if (iti) {
     var parentElem = document.querySelectorAll('[iti="'+iti+'"]')[0];
     var childElem = parentElem.getElementsByClassName("DQX2Q1B-d-Sb")[0];
     var newDiv = document.createElement("DIV");
     newDiv.style.color = "tomato";
     var message = "co2: " + emissions;
     newDiv.appendChild(document.createTextNode(message));
-    childElem.appendChild(newDiv);
+    if(childElem) {
+      childElem.appendChild(newDiv);
+  
+    }
   }
 }
 
@@ -139,14 +146,17 @@ function onRequest(request, sender, sendResponse) {
     case 'query_flights': 
       console.log("querying flights...");
       // Check if flight info is already there
-      sendResponse(checkIfResultsLoaded());    
+      sendResponse(checkIfResultsLoaded());  
       break;
     case 'process-flights': 
-      console.log("processing flights...");
+      console.warn("processing flights...");
+      sendResponse(checkIfResultsLoaded())
+      // console.log("buildResultData(): ", buildResultData());
+      // sendResponse(buildResultData());
       break;
     case 'insert-content':
       for (var i=0; i<request.data.length; i++) {
-        writeToScreen(request.data[i].iti, request.data[i].emissions, request.data[i].distance);
+        writeToScreen(request.data[i].id, request.data[i].emissions, request.data[i].distance);
       }
     break;
     default:

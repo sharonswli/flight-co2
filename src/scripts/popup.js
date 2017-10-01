@@ -51,7 +51,7 @@ var renderMessage = (message) => {
 
 var renderFlights = function renderFlights(data) {
   var displayContainer = document.getElementById("display-container")
-  console.log("data: ", data);
+  console.log("data at renderFlights: ", data);
   
   if (data) {
     var tmpl = template(data);
@@ -71,8 +71,10 @@ popup.addEventListener("click", function(e) {
   if (e.target && e.target.matches("#save-btn")) {
     e.preventDefault();
     var data = e.target.getAttribute("data-bookmark"); 
+    console.log("data getAttribute: data-bookmark", data);
     ext.runtime.sendMessage({ action: "get-airports", data: data }, function(response) {
       if (response && response.action === "have-airports") {
+        console.log("have-airport response:", response);
         renderMessage("have airports");
         
         ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
