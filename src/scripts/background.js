@@ -10,7 +10,7 @@ ext.runtime.onMessage.addListener(
       var requestData = JSON.parse(request.data.flightsData);
       var flights = requestData.allFlights;
       var relateToLabel = request.data.relateToLabel;
-      if (relateToLabel) {
+      if (relateToLabel && relateToLabel!=="CO2") {
         var relateTo = data.filter(function(item){
           return item.label === relateToLabel;
         })
@@ -21,25 +21,24 @@ ext.runtime.onMessage.addListener(
       xhr.open('GET', chrome.extension.getURL('data/airport-data.json'), true);
       xhr.onreadystatechange = function()
       {
-          if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200)
-          {
-            var data = JSON.parse(xhr.responseText);
-            for (var i=0; i<flights.length; i++) {
-              var flight = flights[i];
-              var flightRoute = flight.flightRoute;
-              var filtered = data.filter(function(airport) {
-                return flightRoute.includes(airport.iata_faa) && airport.iata_faa !== "";
-              });
-
-              flight.emissions = totalEmissions(filtered);
-              if (relateToLabel) {
-                flight.relatedTo = relateToLabel;
-                flight.related = convertCO2(flight.emissions, relateTo[0].CO2e);
-              }
+        if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200)
+        {
+          var data = JSON.parse(xhr.responseText);
+          for (var i=0; i<flights.length; i++) {
+            var flight = flights[i];
+            var flightRoute = flight.flightRoute;
+            var filtered = data.filter(function(airport) {
+              return flightRoute.includes(airport.iata_faa) && airport.iata_faa !== "";
+            });
+            flight.emissions = totalEmissions(filtered);
+            if (relateToLabel && relateToLabel!=="CO2") {
+              flight.relatedTo = relateToLabel;
+              flight.converted = convertCO2(flight.emissions, relateTo[0].CO2e);
             }
-
-            resp({ action: "have-airports", data: flights });
           }
+
+          resp({ action: "have-airports", data: flights });
+        }
 
       };
       xhr.send();

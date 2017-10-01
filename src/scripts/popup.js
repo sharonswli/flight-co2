@@ -11,34 +11,31 @@ storage.get('color', function(resp) {
 });
 
 
-var co2Emissions = () => {
-  var airports = [];
-  var airportA = new Object();
-  airportA.id = 'YVR';
-  airportA.lat = 49.193901062;
-  airportA.long = -123.183998108;
-  var airportB = new Object();
-  airportB.id = 'LGW';
-  airportB.lat = 51.148101806640625;
-  airportB.long = -0.19027799367904663;
-  airports.push(airportA, airportB);
+// var co2Emissions = () => {
+//   var airports = [];
+//   var airportA = new Object();
+//   airportA.id = 'YVR';
+//   airportA.lat = 49.193901062;
+//   airportA.long = -123.183998108;
+//   var airportB = new Object();
+//   airportB.id = 'LGW';
+//   airportB.lat = 51.148101806640625;
+//   airportB.long = -0.19027799367904663;
+//   airports.push(airportA, airportB);
 
-  return(`
-  <div class="site-description">
-    <h3>CO2 emissions from ${airports[0].id} to ${airports[1].id}: ${Math.round(totalEmissions(airports, 'one-way') / 1000  * 10) / 10}t</h3>
-  </div>
-  `)
-}
+//   return(`
+//   <div class="site-description">
+//     <h3>CO2 emissions from ${airports[0].id} to ${airports[1].id}: ${Math.round(totalEmissions(airports, 'one-way') / 1000  * 10) / 10}t</h3>
+//   </div>
+//   `)
+// }
 
-var template = (data) => {
-  var json = JSON.stringify(data);
+var template = () => {
   return (`
-  <div class="site-description">
-    <h3 class="title"> ${data.numFlights}</h3>
   <div class="action-container">
-    <button data-bookmark='${json}' class="btn btn-primary calculate">Default</button>
-    <button data-bookmark='${json}' data-label="a banana" class="btn btn-primary calculate">Bananas</button>
-    <button data-bookmark='${json}' data-label="a year of hand drying" class="btn btn-primary calculate">Year of hand drying</button>
+    <button data-label="CO2" class="btn btn-primary calculate">Default</button>
+    <button data-label="a banana" class="btn btn-primary calculate">Bananas</button>
+    <button data-label="a year of hand drying" class="btn btn-primary calculate">Year of hand drying</button>
   </div>
   `);
 }
@@ -47,47 +44,53 @@ var renderMessage = (message) => {
   displayContainer.innerHTML = `<p class='message'>${message}</p>`;
 }
 
-var renderFlights = function renderFlights(data) {
+document.addEventListener("DOMContentLoaded", function() {
   var displayContainer = document.getElementById("display-container")
-
-  if (data) {
-    var tmpl = template(data);
-    displayContainer.innerHTML = tmpl;
-  } else {
-    renderMessage("Sorry, could not extract flight information")
-  }
-}
-
-ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
-  var activeTab = tabs[0];
-  // Output # of flights
-  chrome.tabs.sendMessage(activeTab.id, { action: 'process-flights' }, renderFlights);
+  displayContainer.innerHTML = template();
 });
+
+// ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
+//   var activeTab = tabs[0];
+//   // Output # of flights
+//   chrome.tabs.sendMessage(activeTab.id, { action: 'process-flights' }, renderFlights);
+// });
+
 
 popup.addEventListener("click", function(e) {
 
     e.preventDefault();
-    var data = {"flightsData": e.target.getAttribute("data-bookmark")};
+    var relateToLabel;
     if (e.target.getAttribute("data-label")) {
-      data.relateToLabel = e.target.getAttribute("data-label");
+      relateToLabel = e.target.getAttribute("data-label");
+      ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        var activeTab = tabs[0];
+        console.log(relateToLabel);
+        // Output # of flights
+        chrome.tabs.sendMessage(activeTab.id, { action: 'set-attribute', data: relateToLabel });
+      });
     }
-
-    ext.runtime.sendMessage({ action: "get-airports", data: data }, function(response) {
-      if (response && response.action === "have-airports") {
-        console.log("have-airport response:", response);
-        renderMessage("have airports");
-
-        ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
-          var activeTab = tabs[0];
-          // Output # of flights
-          chrome.tabs.sendMessage(activeTab.id, { action: 'insert-content', data: response.data });
-        });
-      } else {
-        renderMessage("Sorry, there was an error.");
-      }
-    })
-
 });
+
+// popup.addEventListener("click", function(e) {
+//   if (e.target && e.target.matches("#save-btn")) {
+//     e.preventDefault();
+//     var data = e.target.getAttribute("data-bookmark");
+//     ext.runtime.sendMessage({ action: "get-airports", data: data }, function(response) {
+//       if (response && response.action === "have-airports") {
+//         console.log("have-airport response:", response);
+//         renderMessage("have airports");
+
+//         ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
+//           var activeTab = tabs[0];
+//           // Output # of flights
+//           chrome.tabs.sendMessage(activeTab.id, { action: 'insert-content', data: response.data });
+//         });
+//       } else {
+//         renderMessage("Sorry, there was an error.");
+//       }
+//     })
+//   }
+// });
 
 var optionsLink = document.querySelector(".js-options");
 optionsLink.addEventListener("click", function(e) {

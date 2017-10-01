@@ -1,4 +1,5 @@
 import ext from "./utils/ext";
+let relateTo;
 
 function getDepartureArrivalAirports() {
   var urlArray = (document.location.href).split(';');
@@ -24,18 +25,13 @@ function checkIfResultsLoaded() {
     console.log("Flights not yet loaded. Aborting...");
     return;
   }
-  // If results are loaded:
-  const destination = getDepartureArrivalAirports();
-  const flightResults = extractFlights(flights, destination);
+  return flights;
 
-  return buildResultData(destination, flights.length, flightResults);
 }
 
-function buildResultData(destination, numFlights, flightResults) {
-  // console.log("build: destionation: ", destination);
-  // console.log("build: numFlights: ", numFlights);
-  // console.log("build :flightResults: ", flightResults);
 
+function buildResultData(flights) {
+  // Final flightData response
   const flightData = {
     departingAirport: "",
     arrivingAirport: "",
@@ -44,6 +40,10 @@ function buildResultData(destination, numFlights, flightResults) {
     numFlights: null
   };
 
+
+  const destination = getDepartureArrivalAirports();
+  const flightResults = extractFlights(flights, destination);
+
   // Input departingAirport and arrivingAirport data
   if(destination && destination.from && destination.to) {
     flightData.departingAirport = destination.from;
@@ -51,15 +51,40 @@ function buildResultData(destination, numFlights, flightResults) {
   }
 
   // Input numFlights
-  if(numFlights) {
-    flightData.numFlights = numFlights;
+  if(flights && flights.length) {
+    flightData.numFlights = flights.length;
   }
 
   if(flightResults) {
     flightData.allFlights = flightResults;
   }
-  console.log("flightData: ", flightData);
   return flightData;
+}
+
+
+function processResultData(flightData, relateTo) {
+  const data = {
+    'flightsData': JSON.stringify(flightData),
+    'relateToLabel': relateTo
+  };
+  // Call get-airports in background.js
+  ext.runtime.sendMessage({ action: "get-airports", data: data }, function(response) {
+    if (response && response.action === "have-airports") {
+      console.log("have-airport response:", response);
+
+      // ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      //   var activeTab = tabs[0];
+      //   // Output # of flights
+      //   chrome.tabs.sendMessage(activeTab.id, { action: 'insert-content', data: response.data });
+      // });
+      for (var i=0; i < response.data.length; i++) {
+        writeToScreen(response.data[i].id, response.data[i].emissions, i, response.data[i].converted, response.data[i].relatedTo);
+      }
+    } else {
+      // renderMessage("Sorry, there was an error.");
+      console.error("Sorry, there was an error.")
+    }
+  })
 }
 
 function extractFlights(flights, destination) {
@@ -90,10 +115,6 @@ function extractFlights(flights, destination) {
 
     // Create flightRoute Array: init with departing Airport
     var flightroute = [destination.from];
-
-    // // Add Layover airports to flightroute array
-    // var flightroute = [data.departingAirport];
-
     flightInfo.flightRoute = flightroute
 
     var layoversElem = flight.getElementsByClassName("DQX2Q1B-d-Z")[0];
@@ -111,58 +132,91 @@ function extractFlights(flights, destination) {
     // Add arriving Airport at the end
     flightInfo.flightRoute.push(destination.to);
 
+
     // Add flight info to allFlights array
     flightResuts.push(flightInfo);
 
-    //   flightInfo.flightRoute = flightroute.concat(layoversArray);
-    // }
-
-    // flightInfo.flightRoute.push(data.arrivingAirport);
-
-    // // Add flight info to allFlights array
-    // data.allFlights.push(flightInfo);
   }
 
   return flightResuts;
 };
 
-var writeToScreen = function writeToScreen(iti, emissions, relatedTo, converted){
-  if (iti) {
-    var parentElem = document.querySelectorAll('[iti="'+iti+'"]')[0];
-    var childElem = parentElem.getElementsByClassName("DQX2Q1B-d-Sb")[0];
-    var newDiv = document.createElement("DIV");
-    newDiv.style.color = "tomato";
-    var message = "co2: " + emissions;
-    var related = `${converted} times  ${relatedTo}`;
-    if (!relatedTo) {
-      newDiv.appendChild(document.createTextNode(message));
-    }
-    else {
-      newDiv.appendChild(document.createTextNode(related));
-    }
-    if(childElem) {
-      childElem.appendChild(newDiv);
 
+var writeToScreen = function writeToScreen(iti, emissions, index, converted, relatedTo){
+  let flightEntry;
+
+  if (iti) {
+    flightEntry = document.querySelectorAll('[iti="'+iti+'"]')[0];
+  } else {
+    // This covers the edge case where one (assumed) div does not have an iti
+    var problemElem = document.querySelectorAll('a.DQX2Q1B-d-X')[index];
+    if(problemElem) {
+      flightEntry = problemElem.parentElement;
     }
   }
+
+  var stopsColumn = flightEntry.getElementsByClassName("DQX2Q1B-d-Sb")[0];
+
+  if(stopsColumn) {
+    let existingEmissionData = stopsColumn.getElementsByClassName("co2-emission");
+
+    if (existingEmissionData && existingEmissionData.length > 0) {
+      // stopsColumn.removeChild(existingEmissionData);
+      for (let i = 0, n = existingEmissionData.length; i < n; i++) {
+        existingEmissionData[i].remove();
+      }
+    }
+  }
+
+  // Create new text node: Assing className 'co2-emission' and style
+  var newDiv = document.createElement("DIV");
+  newDiv.className = "co2-emission";
+  newDiv.style.color = "rgb(18, 177, 74)";
+  if (!relatedTo) {
+    newDiv.appendChild(document.createTextNode(`co2e(kg): ${Math.round(emissions * 100)/100}`));
+  } else {
+    newDiv.appendChild(document.createTextNode(`${converted} times  ${relatedTo}`));
+  }
+  stopsColumn.appendChild(newDiv);
+
 }
 
 function onRequest(request, sender, sendResponse) {
+
+  let flights;
+
   switch(request.action) {
     case 'query_flights':
       console.warn("querying flights...");
       // Check if flight info is already there
-      sendResponse(checkIfResultsLoaded());
-      break;
-    case 'process-flights':
-      console.warn("processing flights...");
-      sendResponse(checkIfResultsLoaded())
-      break;
-    case 'insert-content':
-      for (var i=0; i<request.data.length; i++) {
-        writeToScreen(request.data[i].id, request.data[i].emissions, request.data[i].relatedTo, request.data[i].related);
+
+      flights = checkIfResultsLoaded();
+      if(flights && flights.length > 0) {
+        processResultData(buildResultData(flights), relateTo);
+        // sendResponse(buildResultData(flights));
       }
-    break;
+      break;
+    case 'set-attribute':
+      relateTo = request.data;
+      flights = checkIfResultsLoaded();
+      if(flights && flights.length > 0) {
+        processResultData(buildResultData(flights), relateTo);
+        // sendResponse(buildResultData(flights));
+      }
+      break;
+    // case 'process-flights':
+    //   console.warn("processing flights...");
+    //   flights = checkIfResultsLoaded();
+    //   if(flights && flights.length > 0) {
+    //     sendResponse(buildResultData(flights));
+    //   }
+    //   break;
+    // case 'insert-content':
+    //   for (var i=0; i<request.data.length; i++) {
+    //     writeToScreen(request.data[i].id, request.data[i].emissions, request.data[i].distance, i);
+    //   }
+    // break;
+
     default:
       console.log("action unknown");
   }
