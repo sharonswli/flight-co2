@@ -13,22 +13,20 @@ ext.runtime.onMessage.addListener(
       xhr.open('GET', chrome.extension.getURL('data/airport-data.json'), true);
       xhr.onreadystatechange = function()
       {
-          if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200)
-          {
-            var data = JSON.parse(xhr.responseText);
-            for (var i=0; i<flights.length; i++) {
-              var flight = flights[i];
-              var flightRoute = flight.flightRoute;
-              var filtered = data.filter(function(airport) {
-                return flightRoute.includes(airport.iata_faa) && airport.iata_faa !== "";
-              });
+        if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200)
+        {
+          var data = JSON.parse(xhr.responseText);
+          for (var i=0; i<flights.length; i++) {
+            var flight = flights[i];
+            var flightRoute = flight.flightRoute;
+            var filtered = data.filter(function(airport) {
+              return flightRoute.includes(airport.iata_faa) && airport.iata_faa !== "";
+            });
 
-              flight.emissions = totalEmissions(filtered);
-            }
-
-            resp({ action: "have-airports", data: flights });
+            flight.emissions = totalEmissions(filtered);
           }
-          
+          resp({ action: "have-airports", data: flights });
+        }
       };
       xhr.send();
       return true;
