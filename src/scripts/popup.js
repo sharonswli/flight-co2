@@ -33,9 +33,12 @@ storage.get('color', function(resp) {
 var template = () => {
   return (`
   <div class="action-container">
-    <button data-label="CO2" class="btn btn-primary calculate">Default</button>
-    <button data-label="a banana" class="btn btn-primary calculate">Bananas</button>
-    <button data-label="a year of hand drying" class="btn btn-primary calculate">Year of hand drying</button>
+    <ul>
+      <li><a href="" data-label="CO2">Default</a></li>
+      <li><a href="" data-label="a banana">Bananas</a></li>
+      <li><a href="" data-label="a year's worth of wine">Year's worth of wine</a></li>
+      <li><a href="" data-label="average North American">Average North American</a></li>
+    </ul>
   </div>
   `);
 }
@@ -64,7 +67,6 @@ popup.addEventListener("click", function(e) {
       relateToLabel = e.target.getAttribute("data-label");
       ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
         var activeTab = tabs[0];
-        console.log(relateToLabel);
         // Output # of flights
         chrome.tabs.sendMessage(activeTab.id, { action: 'set-attribute', data: relateToLabel });
       });
