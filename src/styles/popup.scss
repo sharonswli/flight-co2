@@ -8,7 +8,7 @@ body, html {
 }
 
 #app {
-  padding: 20px 20px;
+  // font-family: Roboto;
   background: $white;
 }
 
@@ -33,19 +33,16 @@ footer {
 
 .app-name {
   font-size: 14px;
-  text-transform: uppercase;
-  color: $text-secondary;
   text-align: center;
-  margin: 0 auto 1em auto;
-  padding: 0;
+  color: rgba(0,0,0,0.87);
 }
 
-.description {
-  color: $text-secondary;
-  text-align: center;
+p.description {
+  color: rgba(0,0,0,0.87);
   max-height: 100px;
   font-size: 0.8em;
   line-height: 1.2;
+  margin: 30px 0 10px;
 }
 
 .site-description {
@@ -71,7 +68,6 @@ footer {
 }
 
 .action-container {
-  margin: 1em auto;
 }
 
 .btn {
@@ -87,3 +83,38 @@ footer {
   outline: none;
   font-size: 1em;
 }
+
+.popup-content {
+  header {
+    margin: 20px 20px 0;
+  }
+
+  footer {
+    padding: 20px 20px;
+  }
+}
+
+.list-unstyled {
+  list-style: none;
+  padding-left: 0;
+}
+
+.dropdown-item { 
+  font-size: 12px;
+  text-transform: uppercase;
+
+  &.active,
+  &:hover {
+    background-color: #A0C8E1; /* colour can be changed */
+
+    a {
+      color: white;
+    }
+  }
+
+  a {
+    display: block;
+    color: rgba(0,0,0,0.38);
+    padding: 10px 20px;
+  }
+ }
