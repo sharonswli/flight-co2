@@ -31,7 +31,8 @@ ext.runtime.onMessage.addListener(
               return flightRoute.includes(airport.iata_faa) && airport.iata_faa !== "";
             });
             flight.emissions = totalEmissions(filtered);
-            if (relateToLabel && relateToLabel!=="CO2") {
+            // check if there is an attribute that was set for data conversion and if it was found in the dataset
+            if (relateTo && relateTo.length) {
               flight.relatedTo = relateToLabel;
               flight.converted = convertCO2(flight.emissions, relateTo[0].CO2e);
             }

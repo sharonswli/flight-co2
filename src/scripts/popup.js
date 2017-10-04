@@ -67,7 +67,6 @@ popup.addEventListener("click", function(e) {
       relateToLabel = e.target.getAttribute("data-label");
       ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
         var activeTab = tabs[0];
-        // Output # of flights
         chrome.tabs.sendMessage(activeTab.id, { action: 'set-attribute', data: relateToLabel });
       });
     }
