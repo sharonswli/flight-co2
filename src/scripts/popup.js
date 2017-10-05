@@ -30,36 +30,27 @@ storage.get('color', function(resp) {
 //   `)
 // }
 
-// var template = (data) => {
-//   var json = JSON.stringify(data);
-//   return (`
-//   <div class="site-description">
-//     <h3 class="title">Hello!</h3>
-//     <h3 class="title">${data.title}</h3>
-//     <p class="description">${data.description}</p>
-//     <p>Flights evaluated: ${data.numFlights}</p>
-//     <a href="${data.url}" target="_blank" class="url">${data.url}</a>
-//   </div>
-//   <div class="action-container">
-//     <button data-bookmark='${json}' id="save-btn" class="btn btn-primary">Save</button>
-//   </div>
-//   `);
-// }
-// var renderMessage = (message) => {
-//   var displayContainer = document.getElementById("display-container");
-//   displayContainer.innerHTML = `<p class='message'>${message}</p>`;
-// }
+var template = () => {
+  return (`
+  <div class="action-container">
+    <ul class="dropdown list-unstyled">
+      <li class="dropdown-item active"><a href="" data-label="CO2">CO2 Emissions</a></li>
+      <li class="dropdown-item"><a href="" data-label="a banana">Bananas</a></li>
+      <li class="dropdown-item"><a href="" data-label="a year's worth of wine">A year of wine</a></li>
+      <li class="dropdown-item"><a href="" data-label="average North American">Average North American</a></li>
+    </ul>
+  </div>
+  `);
+}
+var renderMessage = (message) => {
+  var displayContainer = document.getElementById("display-container");
+  displayContainer.innerHTML = `<p class='message'>${message}</p>`;
+}
 
-// var renderFlights = function renderFlights(data) {
-//   var displayContainer = document.getElementById("display-container")
-//   console.log("renderFlights data: ", data);
-//   if (data) {
-//     var tmpl = template(data);
-//     displayContainer.innerHTML = tmpl; 
-//   } else {
-//     renderMessage("Sorry, could not extract flight information")
-//   }
-// }
+document.addEventListener("DOMContentLoaded", function() {
+  var displayContainer = document.getElementById("display-container")
+  displayContainer.innerHTML = template();
+});
 
 // ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
 //   var activeTab = tabs[0];
@@ -67,15 +58,40 @@ storage.get('color', function(resp) {
 //   chrome.tabs.sendMessage(activeTab.id, { action: 'process-flights' }, renderFlights);
 // });
 
+
+popup.addEventListener("click", function(e) {
+
+    e.preventDefault();
+    var relateToLabel;
+    var dropdownItems = document.querySelectorAll('.dropdown-item');
+    if (e.target.getAttribute("data-label")) {
+      relateToLabel = e.target.getAttribute("data-label");
+      // Remove active class for siblings
+      for (var i = 0; i < dropdownItems.length; i++) {
+        if (dropdownItems[i].classList.contains('active')) {
+          dropdownItems[i].classList.remove('active');
+          break;
+        }
+      }
+      // Add active class to selected dropdown item
+      e.target.parentElement.classList.add('active')
+
+      ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        var activeTab = tabs[0];
+        chrome.tabs.sendMessage(activeTab.id, { action: 'set-attribute', data: relateToLabel });
+      });
+    }
+});
+
 // popup.addEventListener("click", function(e) {
 //   if (e.target && e.target.matches("#save-btn")) {
 //     e.preventDefault();
-//     var data = e.target.getAttribute("data-bookmark"); 
+//     var data = e.target.getAttribute("data-bookmark");
 //     ext.runtime.sendMessage({ action: "get-airports", data: data }, function(response) {
 //       if (response && response.action === "have-airports") {
 //         console.log("have-airport response:", response);
 //         renderMessage("have airports");
-        
+
 //         ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
 //           var activeTab = tabs[0];
 //           // Output # of flights

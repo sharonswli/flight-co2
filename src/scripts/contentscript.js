@@ -1,15 +1,16 @@
 import ext from "./utils/ext";
+let relateTo;
 
 function getDepartureArrivalAirports() {
   var urlArray = (document.location.href).split(';');
-  
+
   var from = urlArray[1].split('=')[1].split(',');
   var to = urlArray[2].split('=')[1].split(',');
 
   let departingAirport;
   let arrivingAirport;
 
-  // TODO: handle 'all airports' selection  
+  // TODO: handle 'all airports' selection
   from.length === 1 ? departingAirport = from[0] : departingAirport = 'undefined';
   to.length === 1 ? arrivingAirport = to[0] : arrivingAirport = 'undefined';
 
@@ -18,7 +19,7 @@ function getDepartureArrivalAirports() {
 
 function checkIfResultsLoaded() {
   var flights = document.querySelectorAll('a.DQX2Q1B-d-X');
-  
+
   // If flights results are not loaded in DOM, abort
   if(!flights.length || !flights) {
     console.log("Flights not yet loaded. Aborting...");
@@ -38,10 +39,11 @@ function buildResultData(flights) {
     allFlights: [],
     numFlights: null
   };
-  
+
+
   const destination = getDepartureArrivalAirports();
   const flightResults = extractFlights(flights, destination);
-    
+
   // Input departingAirport and arrivingAirport data
   if(destination && destination.from && destination.to) {
     flightData.departingAirport = destination.from;
@@ -59,20 +61,24 @@ function buildResultData(flights) {
   return flightData;
 }
 
-function processResultData(flightData) {
-  const data = JSON.stringify(flightData);
+
+function processResultData(flightData, relateTo) {
+  const data = {
+    'flightsData': JSON.stringify(flightData),
+    'relateToLabel': relateTo
+  };
   // Call get-airports in background.js
   ext.runtime.sendMessage({ action: "get-airports", data: data }, function(response) {
     if (response && response.action === "have-airports") {
       console.log("have-airport response:", response);
-      
+
       // ext.tabs.query({active: true, currentWindow: true}, function(tabs) {
       //   var activeTab = tabs[0];
       //   // Output # of flights
       //   chrome.tabs.sendMessage(activeTab.id, { action: 'insert-content', data: response.data });
       // });
       for (var i=0; i < response.data.length; i++) {
-        writeToScreen(response.data[i].id, response.data[i].emissions, response.data[i].distance, i);
+        writeToScreen(response.data[i].id, response.data[i].emissions, i, response.data[i].converted, response.data[i].relatedTo);
       }
     } else {
       // renderMessage("Sorry, there was an error.");
@@ -81,13 +87,13 @@ function processResultData(flightData) {
   })
 }
 
-function extractFlights(flights, destination) {  
-  
+function extractFlights(flights, destination) {
+
   const flightResuts = [];
   // Get allFlights Array
   for (var i = 0; i < flights.length; i++) {
     var flight = flights[i];
-    
+
     var flightInfo = {
       id: "",
       numLayovers: "",
@@ -126,14 +132,17 @@ function extractFlights(flights, destination) {
     // Add arriving Airport at the end
     flightInfo.flightRoute.push(destination.to);
 
-    // Add flight info to allFlights array  
-    flightResuts.push(flightInfo); 
+
+    // Add flight info to allFlights array
+    flightResuts.push(flightInfo);
+
   }
 
   return flightResuts;
 };
 
-var writeToScreen = function writeToScreen(iti, emissions, distance, index){
+
+var writeToScreen = function writeToScreen(iti, emissions, index, converted, relatedTo){
   let flightEntry;
 
   if (iti) {
@@ -142,7 +151,7 @@ var writeToScreen = function writeToScreen(iti, emissions, distance, index){
     // This covers the edge case where one (assumed) div does not have an iti
     var problemElem = document.querySelectorAll('a.DQX2Q1B-d-X')[index];
     if(problemElem) {
-      flightEntry = problemElem.parentElement;    
+      flightEntry = problemElem.parentElement;
     }
   }
 
@@ -150,7 +159,7 @@ var writeToScreen = function writeToScreen(iti, emissions, distance, index){
 
   if(stopsColumn) {
     let existingEmissionData = stopsColumn.getElementsByClassName("co2-emission");
-    
+
     if (existingEmissionData && existingEmissionData.length > 0) {
       // stopsColumn.removeChild(existingEmissionData);
       for (let i = 0, n = existingEmissionData.length; i < n; i++) {
@@ -163,37 +172,51 @@ var writeToScreen = function writeToScreen(iti, emissions, distance, index){
   var newDiv = document.createElement("DIV");
   newDiv.className = "co2-emission";
   newDiv.style.color = "rgb(18, 177, 74)";
-  newDiv.appendChild(document.createTextNode(`co2e(kg): ${Math.round(emissions * 100)/100}`));
+  if (!relatedTo) {
+    newDiv.appendChild(document.createTextNode(`co2e(kg): ${Math.round(emissions * 100)/100}`));
+  } else {
+    newDiv.appendChild(document.createTextNode(`${converted} times  ${relatedTo}`));
+  }
   stopsColumn.appendChild(newDiv);
-  
+
 }
 
 function onRequest(request, sender, sendResponse) {
-  
+
   let flights;
 
   switch(request.action) {
-    case 'query_flights': 
+    case 'query_flights':
       console.warn("querying flights...");
       // Check if flight info is already there
+
       flights = checkIfResultsLoaded();
       if(flights && flights.length > 0) {
-        processResultData(buildResultData(flights));
+        processResultData(buildResultData(flights), relateTo);
         // sendResponse(buildResultData(flights));
-      } 
+      }
       break;
-    // case 'process-flights': 
+    case 'set-attribute':
+      relateTo = request.data;
+      flights = checkIfResultsLoaded();
+      if(flights && flights.length > 0) {
+        processResultData(buildResultData(flights), relateTo);
+        // sendResponse(buildResultData(flights));
+      }
+      break;
+    // case 'process-flights':
     //   console.warn("processing flights...");
     //   flights = checkIfResultsLoaded();
     //   if(flights && flights.length > 0) {
     //     sendResponse(buildResultData(flights));
-    //   } 
+    //   }
     //   break;
     // case 'insert-content':
     //   for (var i=0; i<request.data.length; i++) {
     //     writeToScreen(request.data[i].id, request.data[i].emissions, request.data[i].distance, i);
     //   }
     // break;
+
     default:
       console.log("action unknown");
   }
