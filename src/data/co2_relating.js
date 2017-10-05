@@ -240,6 +240,10 @@ const data = [
    "CO2e": 28000
  },
  {
+   "label": "average Canadian",
+   "CO2e": 15100
+ },
+ {
    "label": "average person in China",
    "CO2e": 3300
  },
