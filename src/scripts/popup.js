@@ -17,8 +17,11 @@ var template = () => {
     <ul class="dropdown list-unstyled">
       <li class="dropdown-item active"><a href="" data-label="CO2">CO2 Emissions</a></li>
       <li class="dropdown-item"><a href="" data-label="a banana">Bananas</a></li>
+      <li class="dropdown-item"><a href="" data-label="a burger">Burgers</a></li>
+      <li class="dropdown-item"><a href="" data-label="1kg of household waste">1kg Household waste</a></li>
       <li class="dropdown-item"><a href="" data-label="a 2 mile car journey">A 2 mile car journey</a></li>
       <li class="dropdown-item"><a href="" data-label="a year's worth of wine">A year of wine</a></li>
+      <li class="dropdown-item"><a href="" data-label="a large wedding (300 guests)">a large wedding (300 guests)</a></li>
       <li class="dropdown-item"><a href="" data-label="average North American">Average North American</a></li>
       <li class="dropdown-item"><a href="" data-label="average Canadian">Average Canadian</a></li>
     </ul>

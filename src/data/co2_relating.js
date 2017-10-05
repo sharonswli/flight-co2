@@ -1,6 +1,6 @@
 const data = [
  {
-   "label": " burger",
+   "label": "a burger",
    "CO2e": 2.5
  },
  {
@@ -20,7 +20,7 @@ const data = [
    "CO2e": 4
  },
  {
-   "label": "1 kilo of household waste",
+   "label": "1kg of household waste",
    "CO2e": 0.7
  },
  {
@@ -48,7 +48,7 @@ const data = [
    "CO2e": 0.034
  },
  {
-   "label": "2009 australian bushfires",
+   "label": "2009 Australian Bushfires",
    "CO2e": 165000000000
  },
  {
@@ -432,7 +432,7 @@ const data = [
    "CO2e": 0.34
  },
  {
-   "label": "large wedding (300 guests)",
+   "label": "a large wedding (300 guests)",
    "CO2e": 84500
  },
  {

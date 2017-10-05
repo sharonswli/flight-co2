@@ -205,19 +205,6 @@ function onRequest(request, sender, sendResponse) {
         // sendResponse(buildResultData(flights));
       }
       break;
-    // case 'process-flights':
-    //   console.warn("processing flights...");
-    //   flights = checkIfResultsLoaded();
-    //   if(flights && flights.length > 0) {
-    //     sendResponse(buildResultData(flights));
-    //   }
-    //   break;
-    // case 'insert-content':
-    //   for (var i=0; i<request.data.length; i++) {
-    //     writeToScreen(request.data[i].id, request.data[i].emissions, request.data[i].distance, i);
-    //   }
-    // break;
-
     default:
       console.log("action unknown");
   }

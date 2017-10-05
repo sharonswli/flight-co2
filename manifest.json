@@ -5,7 +5,7 @@
   "description": "Find out the CO2 Footprint of your next flight!",
   "icons": {
     "16": "icons/icon-16.png",
-    "128": "icons/icon-128.png"
+    "128": "icons/icon-flight-128.png"
   },
   "default_locale": "en",
   "background": {
@@ -39,7 +39,7 @@
   "browser_action": {
     "default_icon": {
       "19": "icons/icon-19.png",
-      "38": "icons/icon-38.png"
+      "38": "icons/icon-flight-38.png"
     },
     "default_title": "CO2 Info on your Selected Flight",
     "default_popup": "popup.html"
