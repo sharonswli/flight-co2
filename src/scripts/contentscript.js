@@ -172,6 +172,7 @@ var writeToScreen = function writeToScreen(iti, emissions, index, converted, rel
   var newDiv = document.createElement("DIV");
   newDiv.className = "co2-emission";
   newDiv.style.color = "rgb(18, 177, 74)";
+  newDiv.style.whiteSpace = 'normal';
   if (!relatedTo) {
     newDiv.appendChild(document.createTextNode(`co2e(kg): ${Math.round(emissions * 100)/100}`));
   } else {
